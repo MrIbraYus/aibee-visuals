@@ -11,12 +11,14 @@ import { telUrl, whatsappUrl } from "@/lib/contact";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 
 const Swirl3D = dynamic(() => import("@/components/three/Swirl3D"), { ssr: false });
+import { useIsDesktop } from "@/lib/useMedia";
 
 /** CTA — "Have a good idea? Let's make it matter." Letters ripple near the cursor. */
 export function Contact() {
   const ref = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const scrollP = useRef(0);
+  const isDesktop = useIsDesktop();
   const [copied, setCopied] = useState(false);
 
   useGSAP(
@@ -95,10 +97,14 @@ export function Contact() {
 
   return (
     <section id="contact" ref={ref} className="relative z-10 overflow-hidden bg-ink">
-      <Swirl3D
-        scrollRef={scrollP}
-        className="!absolute -right-[45%] top-[25%] h-[90%] w-[95%] opacity-50 sm:-right-[8%] sm:top-[-10%] sm:h-[130%] sm:w-[44%] sm:opacity-95 lg:-right-[9%] lg:w-[32%]"
-      />
+      {isDesktop ? (
+        <Swirl3D scrollRef={scrollP} className="!absolute -right-[9%] top-[-10%] h-[130%] w-[32%] opacity-95" />
+      ) : (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full bg-[radial-gradient(circle,rgba(18,97,245,0.55),transparent_68%)] blur-2xl"
+        />
+      )}
       <div className="frame relative grid items-center gap-10 py-[clamp(72px,8vw,120px)] lg:grid-cols-12">
         <h2 ref={headingRef} className="text-white lg:col-span-8" aria-label="Have a good idea? Let's make it matter.">
           <span

@@ -25,7 +25,7 @@ export function WhatsAppButton() {
           animate={{ scale: 1, opacity: 1, rotate: 0 }}
           exit={{ scale: 0, opacity: 0 }}
           transition={{ type: "spring", stiffness: 260, damping: 20, delay: 1.2 }}
-          className="group fixed bottom-4 right-4 z-[60] flex h-14 items-center gap-0 overflow-hidden rounded-full bg-[#25d366] pl-4 pr-4 text-[#06210f] shadow-[0_12px_40px_rgba(37,211,102,0.35)] transition-[gap,padding] duration-500 ease-expo hover:gap-2.5 hover:pr-5 sm:bottom-6 sm:right-6"
+          className="group fixed bottom-4 right-4 z-[60] hidden h-14 items-center gap-0 overflow-hidden rounded-full bg-[#25d366] pl-4 pr-4 text-[#06210f] shadow-[0_12px_40px_rgba(37,211,102,0.35)] transition-[gap,padding] duration-500 ease-expo hover:gap-2.5 hover:pr-5 sm:bottom-6 sm:right-6 lg:flex"
         >
           <span className="absolute inset-0 animate-ping rounded-full bg-[#25d366] opacity-20 [animation-duration:2.4s]" aria-hidden />
           <WhatsAppIcon className="relative size-6 shrink-0" />

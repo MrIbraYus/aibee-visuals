@@ -1,6 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { getAdminDb } from "@/lib/server/firebase-admin";
+import published from "@/content/published.json";
 import { seedContent } from "./seed";
 import type { Brand, Inquiry, Project, SiteContent } from "./types";
 
@@ -37,6 +38,12 @@ async function writeJson(file: string, data: unknown) {
   await rename(tmp, file);
 }
 
+/** Content published with `bun run content:publish`, else the bundled starter set. */
+function starterContent(): SiteContent {
+  const p = published as unknown as SiteContent | null;
+  return p ? structuredClone(p) : seedContent();
+}
+
 /* --------------------------------- reads -------------------------------- */
 
 export async function readContent(): Promise<SiteContent> {
@@ -44,7 +51,7 @@ export async function readContent(): Promise<SiteContent> {
   if (mode === "firestore") {
     const db = getAdminDb()!;
     const meta = await db.doc("site/meta").get();
-    if (!meta.exists) return seedContent();
+    if (!meta.exists) return starterContent();
     const [projectsSnap, brandsDoc] = await Promise.all([db.collection("projects").get(), db.doc("site/brands").get()]);
     return {
       projects: projectsSnap.docs.map((d) => d.data() as Project),
@@ -52,9 +59,9 @@ export async function readContent(): Promise<SiteContent> {
     };
   }
   if (mode === "local") {
-    return (await readJson<SiteContent>(CONTENT_FILE)) ?? seedContent();
+    return (await readJson<SiteContent>(CONTENT_FILE)) ?? starterContent();
   }
-  return seedContent();
+  return starterContent();
 }
 
 /* -------------------------------- writes -------------------------------- */
@@ -71,14 +78,14 @@ async function ensureInitialised(): Promise<SiteContent> {
   if (mode === "local") {
     const existing = await readJson<SiteContent>(CONTENT_FILE);
     if (existing) return existing;
-    const seed = seedContent();
+    const seed = starterContent();
     await writeJson(CONTENT_FILE, seed);
     return seed;
   }
   const db = getAdminDb()!;
   const meta = await db.doc("site/meta").get();
   if (meta.exists) return readContent();
-  const seed = seedContent();
+  const seed = starterContent();
   const batch = db.batch();
   for (const p of seed.projects) batch.set(db.collection("projects").doc(p.id), p);
   batch.set(db.doc("site/brands"), { items: seed.brands });

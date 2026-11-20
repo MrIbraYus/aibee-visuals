@@ -60,7 +60,7 @@ export function Nav() {
         initial={{ y: -140, opacity: 0 }}
         animate={introDone ? { y: hidden ? -140 : 0, opacity: 1 } : { y: -140, opacity: 0 }}
         transition={{ duration: 0.9, ease, delay: introDone && !hidden ? 0.35 : 0 }}
-        className="fixed inset-x-0 top-3 z-50 px-3 sm:top-6 sm:px-[var(--gutter)]"
+        className="fixed inset-x-0 top-3 z-[57] px-3 sm:top-6 sm:px-[var(--gutter)]"
       >
         <nav
           aria-label="Primary"
@@ -137,7 +137,7 @@ export function Nav() {
             animate={{ clipPath: "circle(150% at calc(100% - 44px) 44px)" }}
             exit={{ clipPath: "circle(0% at calc(100% - 44px) 44px)" }}
             transition={{ duration: 0.8, ease }}
-            className="fixed inset-0 z-40 flex flex-col justify-between bg-ink px-6 pb-10 pt-28 lg:hidden"
+            className="fixed inset-0 z-[56] flex flex-col justify-between bg-ink px-6 pb-[calc(2.5rem+env(safe-area-inset-bottom))] pt-28 lg:hidden"
           >
             <ul className="flex flex-col gap-1">
               {navLinks.map((link, i) => (
@@ -151,7 +151,6 @@ export function Nav() {
                     transition={{ duration: 0.7, ease, delay: 0.15 + i * 0.05 }}
                     className="flex w-full items-baseline gap-4 py-1 text-left"
                   >
-                    <span className="text-xs text-blue">0{i + 1}</span>
                     <span className={cn("serif-i text-[13vw] leading-[1.05]", current === link.href ? "text-lime" : "text-white")}>
                       {link.label}
                     </span>

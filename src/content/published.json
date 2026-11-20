@@ -1,0 +1,786 @@
+{
+  "projects": [
+    {
+      "id": "campusride",
+      "slug": "campusride",
+      "client": "CampusRide",
+      "title": "Ride together. Save together.",
+      "category": "Brand Identity",
+      "year": "2026",
+      "summary": "Identity, app touchpoints and the launch campaign for a student ride-sharing app — two figures moving as one, real campus locations and a price point students remember.",
+      "services": [
+        "Logo design",
+        "Brand identity",
+        "Campaign",
+        "App UI"
+      ],
+      "accent": "#1c7a3e",
+      "featured": true,
+      "published": true,
+      "order": 0,
+      "assets": [
+        {
+          "id": "seed001",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/campusride/ride-together.webp",
+            "kind": "image",
+            "width": 2160,
+            "height": 2700
+          },
+          "title": "Launch campaign",
+          "hero": true,
+          "heroOrder": 10,
+          "createdAt": 1790000001000
+        },
+        {
+          "id": "seed002",
+          "type": "logo",
+          "media": {
+            "url": "/portfolio/campusride/logo-rationale.webp",
+            "kind": "image",
+            "width": 1600,
+            "height": 2000
+          },
+          "title": "Logo & rationale",
+          "createdAt": 1790000002000
+        },
+        {
+          "id": "seed003",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/campusride/share-the-ride.webp",
+            "kind": "image",
+            "width": 2160,
+            "height": 2700
+          },
+          "title": "Share the ride",
+          "hero": true,
+          "heroOrder": 12,
+          "createdAt": 1790000003000
+        },
+        {
+          "id": "seed004",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/campusride/students.webp",
+            "kind": "image",
+            "width": 2160,
+            "height": 2700
+          },
+          "title": "Made for students",
+          "hero": true,
+          "heroOrder": 1,
+          "createdAt": 1790000004000
+        },
+        {
+          "id": "seed005",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/campusride/splash-screen.webp",
+            "kind": "image",
+            "width": 1600,
+            "height": 2844
+          },
+          "title": "App splash screen",
+          "createdAt": 1790000005000
+        },
+        {
+          "id": "929c71afbe66477e",
+          "type": "design",
+          "media": {
+            "url": "cloudinary:vs8lglqrfdbrnxkecxqj",
+            "kind": "image",
+            "width": 1200,
+            "height": 1500,
+            "bytes": 172074,
+            "format": "webp"
+          },
+          "title": "USB",
+          "hero": true,
+          "heroOrder": 5,
+          "createdAt": 1795178697107
+        },
+        {
+          "id": "eb456c47b02240d9",
+          "type": "design",
+          "media": {
+            "url": "cloudinary:eijufutmimmopecszdqz",
+            "kind": "image",
+            "width": 1080,
+            "height": 1440,
+            "bytes": 206894,
+            "format": "webp"
+          },
+          "title": "astro Desiign -L",
+          "hero": true,
+          "heroOrder": 0,
+          "createdAt": 1795178713597
+        },
+        {
+          "id": "22af18d38b4d44aa",
+          "type": "design",
+          "media": {
+            "url": "cloudinary:rxdectfgdxyjldnjgs0w",
+            "kind": "image",
+            "width": 1200,
+            "height": 1600,
+            "bytes": 282506,
+            "format": "webp"
+          },
+          "title": "opv design",
+          "createdAt": 1795178819022
+        },
+        {
+          "id": "c025f18dc1484725",
+          "type": "design",
+          "media": {
+            "url": "cloudinary:oukft36agdevpvv9osmy",
+            "kind": "image",
+            "width": 1920,
+            "height": 2400,
+            "bytes": 287218,
+            "format": "webp"
+          },
+          "title": "c -design",
+          "createdAt": 1795178843418
+        },
+        {
+          "id": "623b409b99484866",
+          "type": "design",
+          "media": {
+            "url": "cloudinary:tybnqygcvnue7earusfz",
+            "kind": "image",
+            "width": 1200,
+            "height": 1500,
+            "bytes": 113108,
+            "format": "webp"
+          },
+          "title": "03",
+          "createdAt": 1795178857754
+        },
+        {
+          "id": "675d641247ee4ed9",
+          "type": "design",
+          "media": {
+            "url": "cloudinary:mpxbhr5og9navybuaf0r",
+            "kind": "image",
+            "width": 1200,
+            "height": 1500,
+            "bytes": 169122,
+            "format": "webp"
+          },
+          "title": "01",
+          "createdAt": 1795178857780
+        },
+        {
+          "id": "f1df045fa3c64e9b",
+          "type": "design",
+          "media": {
+            "url": "cloudinary:jzifeoka24hr8v57dk2t",
+            "kind": "image",
+            "width": 1920,
+            "height": 2400,
+            "bytes": 264354,
+            "format": "webp"
+          },
+          "title": "02  CampusRide",
+          "createdAt": 1795179020716
+        },
+        {
+          "id": "32dd7bdac8954557",
+          "type": "design",
+          "media": {
+            "url": "cloudinary:arwfxkgouefapuexhnjz",
+            "kind": "image",
+            "width": 1920,
+            "height": 2400,
+            "bytes": 210194,
+            "format": "webp"
+          },
+          "title": "03  CampusRide",
+          "createdAt": 1795179020860
+        },
+        {
+          "id": "d0f882f5d7104848",
+          "type": "design",
+          "media": {
+            "url": "cloudinary:pdx3m5el1wgpjfcx9jkr",
+            "kind": "image",
+            "width": 1920,
+            "height": 2400,
+            "bytes": 304362,
+            "format": "webp"
+          },
+          "title": "01  CampusRide",
+          "createdAt": 1795179021053
+        },
+        {
+          "id": "aaa70ab666714738",
+          "type": "motion",
+          "media": {
+            "url": "cloudinary:gbp9i72zelvvtwy95uuq",
+            "kind": "video",
+            "width": 1080,
+            "height": 1920,
+            "duration": 4.033333,
+            "poster": "cloudinary:jy7bzvove7z4j4fyzljt",
+            "bytes": 4082543,
+            "format": "mp4"
+          },
+          "title": "splash screen v1",
+          "motionKind": "Motion graphics",
+          "createdAt": 1795179022619
+        },
+        {
+          "id": "6025e07d4cd04591",
+          "type": "design",
+          "media": {
+            "url": "cloudinary:czgc4lkvaotfrzwyu4en",
+            "kind": "image",
+            "width": 1920,
+            "height": 2400,
+            "bytes": 133266,
+            "format": "webp"
+          },
+          "title": "CR logo design",
+          "createdAt": 1795179022810
+        },
+        {
+          "id": "14d2901bfb984422",
+          "type": "design",
+          "media": {
+            "url": "cloudinary:jdttvgs2yy9g86yoclek",
+            "kind": "image",
+            "width": 1920,
+            "height": 2400,
+            "bytes": 274048,
+            "format": "webp"
+          },
+          "title": "04  CampusRide",
+          "createdAt": 1795179023445
+        }
+      ],
+      "createdAt": 1790000000000,
+      "updatedAt": 1795179025912
+    },
+    {
+      "id": "urbandrop",
+      "slug": "urbandrop",
+      "client": "UrbanDrop",
+      "title": "Shop local. Go global.",
+      "category": "Social Media",
+      "year": "2025",
+      "summary": "A merchant-first content system for UrbanDrop: friendly greens, confident type and templates merchants can use every single day — from daily tips to national moments.",
+      "services": [
+        "Content system",
+        "Social design",
+        "Campaigns"
+      ],
+      "accent": "#3fae49",
+      "featured": true,
+      "published": true,
+      "order": 1,
+      "assets": [
+        {
+          "id": "seed006",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/urbandrop/merchant-checklist.webp",
+            "kind": "image",
+            "width": 2160,
+            "height": 2700
+          },
+          "title": "Merchant daily checklist",
+          "hero": true,
+          "heroOrder": 3,
+          "createdAt": 1790000006000
+        },
+        {
+          "id": "seed007",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/urbandrop/stronger-together.webp",
+            "kind": "image",
+            "width": 2160,
+            "height": 2700
+          },
+          "title": "Pink October",
+          "hero": true,
+          "heroOrder": 8,
+          "createdAt": 1790000007000
+        },
+        {
+          "id": "seed008",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/urbandrop/nigeria-independence.webp",
+            "kind": "image",
+            "width": 1600,
+            "height": 2000
+          },
+          "title": "Nigeria Independence Day",
+          "hero": true,
+          "heroOrder": 4,
+          "createdAt": 1790000008000
+        }
+      ],
+      "createdAt": 1790000000000,
+      "updatedAt": 1795178784113
+    },
+    {
+      "id": "royal-empire",
+      "slug": "boako-party-in-the-park",
+      "client": "Royal Empire Entertainment",
+      "title": "Boako Party in the Park.",
+      "category": "Campaign",
+      "year": "2026",
+      "summary": "A bold, collectible artist series for a hometown festival — one system, a poster per headliner, built to sell tickets and live on every timeline.",
+      "services": [
+        "Event campaign",
+        "Artist posters",
+        "Ticketing assets"
+      ],
+      "accent": "#e3262f",
+      "featured": true,
+      "published": true,
+      "order": 2,
+      "assets": [
+        {
+          "id": "seed009",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/royal-empire/boako-youthgod.webp",
+            "kind": "image",
+            "width": 1600,
+            "height": 2200
+          },
+          "title": "Youthgod",
+          "hero": true,
+          "heroOrder": 6,
+          "createdAt": 1790000009000
+        },
+        {
+          "id": "seed010",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/royal-empire/boako-kente-marley.webp",
+            "kind": "image",
+            "width": 1600,
+            "height": 2200
+          },
+          "title": "Kente Marley",
+          "hero": true,
+          "heroOrder": 9,
+          "createdAt": 1790000010000
+        },
+        {
+          "id": "seed011",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/royal-empire/boako-lami-jnr.webp",
+            "kind": "image",
+            "width": 1600,
+            "height": 2200
+          },
+          "title": "Lami Jnr",
+          "hero": true,
+          "heroOrder": 2,
+          "createdAt": 1790000011000
+        },
+        {
+          "id": "seed012",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/royal-empire/xmass-float.webp",
+            "kind": "image",
+            "width": 1600,
+            "height": 2000
+          },
+          "title": "X'mass Float",
+          "createdAt": 1790000012000
+        }
+      ],
+      "createdAt": 1790000000000,
+      "updatedAt": 1795178784113
+    },
+    {
+      "id": "happy-african-market",
+      "slug": "happy-african-market",
+      "client": "Happy African Market",
+      "title": "Fresh picks, ready for your kitchen.",
+      "category": "Social Media",
+      "year": "2026",
+      "summary": "Appetising, conversion-ready social content for an African grocery store — product drops, restocks and milestones in one warm, recognisable look.",
+      "services": [
+        "Social design",
+        "Product art direction",
+        "Promotions"
+      ],
+      "accent": "#2fa84f",
+      "featured": true,
+      "published": true,
+      "order": 3,
+      "assets": [
+        {
+          "id": "seed013",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/happy-african-market/fresh-picks.webp",
+            "kind": "image",
+            "width": 1600,
+            "height": 2000
+          },
+          "title": "Fresh picks",
+          "hero": true,
+          "heroOrder": 11,
+          "createdAt": 1790000013000
+        },
+        {
+          "id": "seed014",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/happy-african-market/puna-yam.webp",
+            "kind": "image",
+            "width": 1600,
+            "height": 2000
+          },
+          "title": "Puna yam drop",
+          "createdAt": 1790000014000
+        },
+        {
+          "id": "seed015",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/happy-african-market/prekese.webp",
+            "kind": "image",
+            "width": 1600,
+            "height": 2000
+          },
+          "title": "Prekese restock",
+          "hero": true,
+          "heroOrder": 7,
+          "createdAt": 1790000015000
+        },
+        {
+          "id": "seed016",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/happy-african-market/anniversary.webp",
+            "kind": "image",
+            "width": 1600,
+            "height": 2000
+          },
+          "title": "One year anniversary",
+          "createdAt": 1790000016000
+        }
+      ],
+      "createdAt": 1790000000000,
+      "updatedAt": 1795178784113
+    },
+    {
+      "published": true,
+      "featured": true,
+      "createdAt": 1790000000000,
+      "updatedAt": 1790000000000,
+      "id": "omnivest",
+      "slug": "omnivest-study-abroad",
+      "client": "Omnivest",
+      "title": "Study abroad, made simple.",
+      "category": "Campaign",
+      "year": "2026",
+      "summary": "An intake campaign for an education consultancy — clear destinations, real students and a single call to action.",
+      "services": [
+        "Campaign design",
+        "Social"
+      ],
+      "accent": "#d71f26",
+      "order": 4,
+      "assets": [
+        {
+          "id": "seed017",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/omnivest/study-abroad.webp",
+            "kind": "image",
+            "width": 1600,
+            "height": 2000
+          },
+          "createdAt": 1790000017000,
+          "title": "January intake"
+        }
+      ]
+    },
+    {
+      "published": true,
+      "featured": false,
+      "createdAt": 1790000000000,
+      "updatedAt": 1790000000000,
+      "id": "opv",
+      "slug": "opv-all-black-party",
+      "client": "OPV",
+      "title": "All Black Party.",
+      "category": "Campaign",
+      "year": "2026",
+      "summary": "Chrome, grit and a strict dress code — a nightlife poster that sets the mood before the doors open.",
+      "services": [
+        "Event poster",
+        "Typography"
+      ],
+      "accent": "#f5c400",
+      "order": 5,
+      "assets": [
+        {
+          "id": "seed018",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/opv/all-black-party.webp",
+            "kind": "image",
+            "width": 1600,
+            "height": 2133
+          },
+          "createdAt": 1790000018000,
+          "title": "Annual All Black Party"
+        }
+      ]
+    },
+    {
+      "published": true,
+      "featured": false,
+      "createdAt": 1790000000000,
+      "updatedAt": 1790000000000,
+      "id": "s-and-o",
+      "slug": "duayaw-nkwanta-home-coming",
+      "client": "S&O Geng",
+      "title": "Home Coming '26.",
+      "category": "Campaign",
+      "year": "2026",
+      "summary": "A loud, sunny first-edition homecoming poster with hand-built 3D lettering.",
+      "services": [
+        "Event poster",
+        "3D lettering"
+      ],
+      "accent": "#2a9df4",
+      "order": 6,
+      "assets": [
+        {
+          "id": "seed019",
+          "type": "design",
+          "media": {
+            "url": "/portfolio/s-and-o/duayaw-nkwanta.webp",
+            "kind": "image",
+            "width": 1600,
+            "height": 2000
+          },
+          "createdAt": 1790000019000,
+          "title": "Duayaw Nkwanta Home Coming"
+        }
+      ]
+    },
+    {
+      "id": "aibee-studio",
+      "slug": "aibee-visuals",
+      "client": "Aibee Visuals",
+      "title": "The studio, in motion.",
+      "category": "Motion",
+      "year": "2026",
+      "summary": "Our own identity in motion — logo animations and experiments that show how we think about movement.",
+      "services": [
+        "Logo animation",
+        "Motion graphics"
+      ],
+      "accent": "#1261f5",
+      "featured": true,
+      "published": true,
+      "order": 7,
+      "assets": [
+        {
+          "id": "seed020",
+          "type": "motion",
+          "media": {
+            "url": "/portfolio/aibee/logo-animation.webm",
+            "kind": "video",
+            "width": 1280,
+            "height": 720,
+            "duration": 6,
+            "poster": "/portfolio/aibee/logo-animation-poster.webp"
+          },
+          "title": "Aibee logo animation",
+          "motionKind": "Logo animation",
+          "reel": true,
+          "createdAt": 1790000020000
+        },
+        {
+          "id": "8dea7edb1af24119",
+          "type": "motion",
+          "media": {
+            "url": "cloudinary:vanohfkkazanlrlinpe5",
+            "kind": "video",
+            "width": 1080,
+            "height": 1350,
+            "duration": 6.533333,
+            "poster": "cloudinary:a8hqhdugnzwat9qycrgs",
+            "bytes": 4440786,
+            "format": "mp4"
+          },
+          "title": "Animate",
+          "motionKind": "Logo animation",
+          "reel": true,
+          "createdAt": 1795177330759
+        },
+        {
+          "id": "7b0a7cc4d9554e83",
+          "type": "motion",
+          "media": {
+            "url": "cloudinary:oqx0davfksv1vf4kqyre",
+            "kind": "video",
+            "width": 960,
+            "height": 720,
+            "duration": 5,
+            "poster": "cloudinary:awekcwhyncxhwe42qf17",
+            "bytes": 4303950,
+            "format": "mp4"
+          },
+          "title": "animo cover ring 720p",
+          "motionKind": "Logo animation",
+          "reel": true,
+          "createdAt": 1795178408512
+        },
+        {
+          "id": "9356e0cd2c7a4cc0",
+          "type": "motion",
+          "media": {
+            "url": "cloudinary:rkk74qfenowqny0cwrvi",
+            "kind": "video",
+            "width": 1080,
+            "height": 1920,
+            "duration": 4.033333,
+            "poster": "cloudinary:zd0s9ewrezvnnmvwkufi",
+            "bytes": 3763798,
+            "format": "mp4"
+          },
+          "title": "splash screen v2",
+          "motionKind": "Logo animation",
+          "reel": true,
+          "createdAt": 1795178420919
+        },
+        {
+          "id": "5d7cb6ee8256412f",
+          "type": "motion",
+          "media": {
+            "url": "cloudinary:fsj4jobgb9kcjr9deldh",
+            "kind": "video",
+            "width": 1920,
+            "height": 1080,
+            "duration": 4.033333,
+            "poster": "cloudinary:dquwggq0hi925rc5mojb",
+            "bytes": 2987135,
+            "format": "mp4"
+          },
+          "title": "01. banner",
+          "motionKind": "Logo animation",
+          "reel": true,
+          "createdAt": 1795178452164
+        },
+        {
+          "id": "c4be37832c5c459a",
+          "type": "motion",
+          "media": {
+            "url": "cloudinary:mubiiuotoiet1nkhpisb",
+            "kind": "video",
+            "width": 720,
+            "height": 900,
+            "duration": 10,
+            "poster": "cloudinary:ckltm1vmvl1jngqjtnpk",
+            "bytes": 10676441,
+            "format": "mp4"
+          },
+          "title": "animo grid zoom strip 900p",
+          "motionKind": "Logo animation",
+          "reel": true,
+          "createdAt": 1795178452320
+        },
+        {
+          "id": "aa19acb30f7c4fcf",
+          "type": "motion",
+          "media": {
+            "url": "cloudinary:ihbjrighwfdggytdbzo9",
+            "kind": "video",
+            "width": 1200,
+            "height": 1200,
+            "duration": 3.533333,
+            "poster": "cloudinary:dr3qgenazxfsawxv4xfd",
+            "bytes": 802069,
+            "format": "mp4"
+          },
+          "title": "Fuddey animation",
+          "motionKind": "Logo animation",
+          "reel": true,
+          "createdAt": 1795178452348
+        }
+      ],
+      "createdAt": 1790000000000,
+      "updatedAt": 1795179384137
+    }
+  ],
+  "brands": [
+    {
+      "id": "urbandrop",
+      "name": "UrbanDrop",
+      "logo": {
+        "url": "/brands/urbandrop.png",
+        "kind": "image",
+        "width": 766,
+        "height": 220
+      },
+      "order": 0
+    },
+    {
+      "id": "mygotickets",
+      "name": "MyGoTickets",
+      "logo": {
+        "url": "cloudinary:e7it62gcjynkcwgta9lk",
+        "kind": "image",
+        "width": 1200,
+        "height": 1200,
+        "bytes": 21288,
+        "format": "webp"
+      },
+      "order": 1
+    },
+    {
+      "id": "royal-empire",
+      "name": "Royal Empire",
+      "order": 2
+    },
+    {
+      "id": "campusride",
+      "name": "CampusRide",
+      "logo": {
+        "url": "/brands/campusride.png",
+        "kind": "image",
+        "width": 977,
+        "height": 181
+      },
+      "order": 3
+    },
+    {
+      "id": "happy-african-market",
+      "name": "Happy African Market",
+      "order": 4
+    },
+    {
+      "id": "omnivest",
+      "name": "Omnivest",
+      "logo": {
+        "url": "cloudinary:pjjcfjtiptuflcsi8gdg",
+        "kind": "image",
+        "width": 1200,
+        "height": 600,
+        "bytes": 46672,
+        "format": "webp"
+      },
+      "order": 5
+    }
+  ]
+}

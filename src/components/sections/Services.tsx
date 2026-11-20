@@ -9,6 +9,8 @@ import { ArrowUpRight } from "@/components/ui/Primitives";
 import { cn, prefersReducedMotion } from "@/lib/utils";
 
 const ServiceIcon3D = dynamic(() => import("@/components/three/ServiceIcon3D"), { ssr: false });
+import Image from "next/image";
+import { useIsDesktop } from "@/lib/useMedia";
 
 function Corner() {
   return (
@@ -20,6 +22,7 @@ function Corner() {
 }
 
 function ServiceColumn({ service }: { service: Service }) {
+  const isDesktop = useIsDesktop();
   const activeRef = useRef(false);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLLIElement>(null);
@@ -62,7 +65,17 @@ function ServiceColumn({ service }: { service: Service }) {
       <div className="flex items-start justify-between">
         <Corner />
         <div className="-mr-3 -mt-4 size-[92px] sm:-mr-4 sm:-mt-6 sm:size-[128px]">
-          <ServiceIcon3D icon={service.icon} activeRef={activeRef} className="size-full" />
+          {isDesktop ? (
+            <ServiceIcon3D icon={service.icon} activeRef={activeRef} className="size-full" />
+          ) : (
+            <Image
+              src={`/icons/services/${service.icon}.webp`}
+              alt=""
+              width={256}
+              height={256}
+              className={cn("float-slow size-full transition-transform duration-700 ease-expo", open && "rotate-[24deg] scale-110")}
+            />
+          )}
         </div>
       </div>
       <h3 className="mt-auto text-[18px] font-semibold leading-[1.1] tracking-[-0.02em] sm:text-[22px]">

@@ -3,6 +3,7 @@
 import { Canvas, type CanvasProps } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useMedia } from "@/lib/useMedia";
 
 type Props = Omit<CanvasProps, "frameloop"> & { className?: string; eager?: boolean };
 
@@ -15,6 +16,7 @@ export function LazyCanvas({ className, children, eager = false, ...props }: Pro
   const ref = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(eager);
   const [visible, setVisible] = useState(eager);
+  const coarse = useMedia("(pointer: coarse)");
 
   useEffect(() => {
     const el = ref.current!;
@@ -34,7 +36,7 @@ export function LazyCanvas({ className, children, eager = false, ...props }: Pro
       {mounted && (
         <Canvas
           frameloop={visible ? "always" : "never"}
-          dpr={[1, 1.75]}
+          dpr={coarse ? [1, 1.25] : [1, 1.75]}
           gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
           {...props}
         >

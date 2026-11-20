@@ -7,6 +7,7 @@ import { ProjectDrawer } from "@/components/project/ProjectDrawer";
 import { Cursor } from "@/components/ui/Cursor";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { SiteOnly } from "@/components/layout/SiteOnly";
+import { MobileTabBar } from "@/components/layout/MobileTabBar";
 import { site } from "@/content/site";
 import "./globals.css";
 
@@ -35,12 +36,21 @@ export const metadata: Metadata = {
     description: site.description,
   },
   twitter: { card: "summary_large_image", title: "Aibee Visuals", description: site.description },
+  applicationName: "Aibee Visuals",
+  appleWebApp: { capable: true, title: "Aibee Visuals", statusBarStyle: "black-translucent" },
+  formatDetection: { telephone: false, email: false, address: false },
   alternates: { canonical: "/" },
 };
 
 export const viewport: Viewport = {
   themeColor: "#080808",
   colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+  // App-like: no pinch / double-tap / input-focus zooming on phones.
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
 /** Skip the intro animation on repeat visits within a session (runs before paint). */
@@ -75,6 +85,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Footer />
             <ProjectDrawer />
             <WhatsAppButton />
+            <MobileTabBar />
             <Cursor />
           </SiteOnly>
         </SmoothScroll>

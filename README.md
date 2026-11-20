@@ -39,18 +39,35 @@ The first save copies the starter content (in `src/lib/content/seed.ts`) into th
 dashboard is the single source of truth. Local mode is for trying things out — to manage the
 deployed site, connect Firebase and Cloudinary (below).
 
-## Going live (Vercel + Firebase + Cloudinary)
+## Deploying on Vercel
 
-1. **Firebase** → create a project, enable **Firestore**, and (optional) **Authentication → Google**.
-   - Project settings → Service accounts → *Generate new private key* → `FIREBASE_PROJECT_ID`,
-     `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`.
-   - For Google sign-in also add the web app config (`NEXT_PUBLIC_FIREBASE_*`).
-   - Deploy the locked-down rules: `firebase deploy --only firestore:rules`.
-2. **Cloudinary** → `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
-   Uploads go straight from your browser to Cloudinary (large videos are fine).
-3. **Dashboard login** → `ADMIN_PASSWORD` and a long random `ADMIN_SESSION_SECRET`.
-4. Push to GitHub, import in **Vercel**, paste the variables from `.env.example`, deploy.
-   Set `NEXT_PUBLIC_SITE_URL` to your domain.
+Your GitHub repo has the site inside the **`aibee-visuals/`** folder, so:
+
+1. **Publish your dashboard content** (moves local uploads to Cloudinary and bakes the content into the site):
+   ```bash
+   npm run content:publish
+   ```
+   Commit the updated `src/content/published.json` (and push).
+2. In Vercel → **Add New → Project** → import `aibee-visuals` from GitHub.
+   - **Root Directory:** `aibee-visuals`
+   - Framework preset: **Next.js** (build command and output are detected automatically).
+3. **Environment variables** → paste everything from your `.env.local`
+   (Project → Settings → Environment Variables, “Production” + “Preview”).
+   Use a long `ADMIN_PASSWORD` — it's the key to your dashboard on the internet.
+4. **Deploy.** Then set your domain and change `NEXT_PUBLIC_SITE_URL` to it.
+
+### Make the live dashboard editable
+
+Without Firebase Admin keys the deployed site shows your published content, and `/admin` on the
+live site is read-only. To edit from anywhere:
+
+1. Firebase console → Project settings → **Service accounts → Generate new private key**.
+2. Put `client_email` → `FIREBASE_CLIENT_EMAIL` and `private_key` → `FIREBASE_PRIVATE_KEY`
+   (in `.env.local` **and** in Vercel), then redeploy.
+3. Run `npm run content:publish` once more — it copies your content into Firestore.
+4. Optional: `firebase deploy --only firestore:rules` to lock the database to the server.
+
+Uploads already go to **Cloudinary** (images and videos are optimised automatically).
 
 ## How project briefs reach you
 

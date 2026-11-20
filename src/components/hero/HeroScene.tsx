@@ -14,6 +14,7 @@ import { imageProps } from "@/lib/media/urls";
 import { LogoStrip } from "./LogoStrip";
 
 const HeroRibbons = dynamic(() => import("@/components/three/HeroRibbons"), { ssr: false });
+import { useIsDesktop } from "@/lib/useMedia";
 
 const CLIENT_HEADLINE = "Brands we’ve helped move forward.".split(" ");
 
@@ -38,6 +39,7 @@ export function HeroScene({ items, brands }: { items: ArcItem[]; brands: Brand[]
   const zoomRef = useRef<HTMLDivElement>(null);
   const marquee = useRef<ArcMarqueeHandle>(null);
   const preferredSlot = useRef(-1);
+  const isDesktop = useIsDesktop();
   const introDone = useIntroDone();
 
   /* ---------------- Entrance (after the preloader) ---------------- */
@@ -214,7 +216,7 @@ export function HeroScene({ items, brands }: { items: ArcItem[]; brands: Brand[]
         className="relative h-svh min-h-[620px] w-full overflow-hidden bg-ink"
       >
         <div ref={curtainRef} className="absolute inset-0 origin-top overflow-hidden will-change-transform">
-          <HeroRibbons className="!absolute inset-0 z-0" />
+          {isDesktop && <HeroRibbons className="!absolute inset-0 z-0" />}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-1/3 bg-gradient-to-t from-ink/60 to-transparent" />
 
           {/* Copy */}

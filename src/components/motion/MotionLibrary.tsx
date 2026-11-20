@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import { Lightbox } from "@/components/media/Lightbox";
 import { VideoCard } from "@/components/media/VideoCard";
 
+const plural: Record<MotionKind, string> = { "Logo animation": "Logo animations", "Motion graphics": "Motion graphics", Video: "Videos" };
+
 const kindOf = (i: MotionItem) => (i.asset.motionKind ?? "Motion graphics") as MotionKind;
 
 /** /motion — every motion piece, filterable, opening in the viewer. */
@@ -36,7 +38,7 @@ export function MotionLibrary({ items }: { items: MotionItem[] }) {
                 kind === k ? "border-lime bg-lime text-ink" : "border-line text-white/80 hover:border-white/40",
               )}
             >
-              {k === "All" ? "All" : `${k}s`}
+              {k === "All" ? "All" : plural[k]}
             </button>
           ))}
         </div>

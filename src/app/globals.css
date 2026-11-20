@@ -148,3 +148,47 @@ img {
     pointer-events: none;
   }
 }
+
+/* ------------------------------------------------------------------
+   App-like behaviour on phones
+------------------------------------------------------------------- */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  touch-action: manipulation; /* no double-tap zoom */
+  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 1023px) {
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
+  /* iOS zooms into inputs smaller than 16px — keep them at 16px */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+  /* Film grain is pretty but costly on phones */
+  .grain {
+    animation: none;
+    opacity: 0.04;
+  }
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@keyframes float-slow {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -6px; }
+}
+.float-slow {
+  animation: float-slow 4.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .float-slow { animation: none; }
+}

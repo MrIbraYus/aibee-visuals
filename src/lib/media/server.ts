@@ -34,7 +34,8 @@ export function uploadTarget(): UploadTarget {
   if (mode === "local") return { mode, url: "/api/admin/media" };
   if (mode === "none") return { mode };
   const { cloudName, apiKey, apiSecret } = cloud();
-  const params = { timestamp: String(Math.round(Date.now() / 1000)), folder: "aibee" };
+  // `asset_folder` works with both fixed and dynamic folder Cloudinary accounts.
+  const params = { timestamp: String(Math.round(Date.now() / 1000)), asset_folder: "aibee" };
   const signature = cloudinary.utils.api_sign_request(params, apiSecret!);
   return {
     mode,

@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "images:optimize": "bun scripts/optimize-images.ts",
-    "media:upload": "bun scripts/upload-media.ts"
+    "media:upload": "node --env-file-if-exists=.env.local scripts/upload-media.mts",
+    "content:publish": "node --env-file-if-exists=.env.local scripts/publish-content.mts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -49,5 +50,8 @@
   "trustedDependencies": [
     "sharp",
     "unrs-resolver"
-  ]
+  ],
+  "engines": {
+    "node": ">=20.9"
+  }
 }

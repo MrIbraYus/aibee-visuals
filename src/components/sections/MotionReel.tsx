@@ -10,6 +10,8 @@ import { ArrowUpRight } from "@/components/ui/Primitives";
 import { Lightbox } from "@/components/media/Lightbox";
 import { VideoCard } from "@/components/media/VideoCard";
 
+const plural: Record<MotionKind, string> = { "Logo animation": "Logo animations", "Motion graphics": "Motion graphics", Video: "Videos" };
+
 const kindOf = (i: MotionItem) => (i.asset.motionKind ?? "Motion graphics") as MotionKind;
 
 /**
@@ -80,7 +82,7 @@ export function MotionReel({ items }: { items: MotionItem[] }) {
                       kind === k ? "border-white bg-white text-blue" : "border-white/35 text-white hover:border-white",
                     )}
                   >
-                    {k === "All" ? "All" : `${k}s`}
+                    {k === "All" ? "All" : plural[k]}
                   </button>
                 ))}
               </div>

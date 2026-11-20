@@ -62,7 +62,7 @@ export function VideoCard({
     >
       <video
         ref={ref}
-        src={videoSrc(media, width)}
+        src={`${videoSrc(media, width)}${videoPoster(media) ? "" : "#t=0.1"}`}
         poster={videoPoster(media, Math.min(width, 1200))}
         muted
         loop

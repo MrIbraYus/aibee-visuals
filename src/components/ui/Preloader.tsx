@@ -76,6 +76,9 @@ export function Preloader() {
         .to(root, { yPercent: -100, duration: 1.15, ease: "expo.inOut" }, "<")
         .to(q("[data-curve]"), { attr: { d: "M0,0 L100,0 Q50,0 0,0 Z" }, duration: 1.15, ease: "power2.in" }, "<");
 
+      // Phones get a quicker intro.
+      if (window.matchMedia("(max-width: 767px)").matches) tl.timeScale(1.6);
+
       // Play once fonts are ready (capped so slow phones/networks never block).
       const start = () => tl.play();
       const timer = window.setTimeout(start, 1200);

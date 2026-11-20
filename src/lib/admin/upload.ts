@@ -22,7 +22,9 @@ function readVideoMeta(file: File): Promise<VideoMeta> {
     };
     const timer = window.setTimeout(() => done({}), 15000);
     video.onloadedmetadata = () => {
-      video.currentTime = Math.min(0.6, (video.duration || 1) / 3);
+      // A frame ~30% in avoids the black/blank opening of most animations.
+      const d = Number.isFinite(video.duration) ? video.duration : 2;
+      video.currentTime = Math.min(Math.max(0.6, d * 0.3), 4);
     };
     video.onseeked = () => {
       const width = video.videoWidth;
