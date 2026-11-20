@@ -1,0 +1,6 @@
+git init
+git remote add origin https://github.com/MrIbraYus/aibee-visuals.git
+git add .
+git commit -m "Initial website upload"
+git branch -M main
+git push -u origin main
