@@ -79,7 +79,18 @@ export function Login({ state, onSuccess }: { state: AdminState; onSuccess: () =
         </h1>
         <p className="mt-3 text-[14px] text-muted">Sign in to manage your work, hero images, brands and motion.</p>
 
-        {noMethod && (
+        {state.problems.length > 0 && (
+          <div className="mt-8 space-y-2 rounded-2xl border border-magenta/40 bg-magenta/10 p-4 text-[13px] leading-[1.5]">
+            <p className="font-semibold">Setup needs attention</p>
+            <ul className="list-disc space-y-1 pl-4 [overflow-wrap:anywhere]">
+              {state.problems.map((p) => (
+                <li key={p}>{p}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {noMethod && state.problems.length === 0 && (
           <p className="mt-8 rounded-2xl border border-magenta/40 bg-magenta/10 p-4 text-[14px] leading-[1.5]">
             No dashboard PIN is set up yet. Run <code className="text-lime">npm run admin:pin -- 1234</code> (with your
             own PIN) or add <code className="text-lime">ADMIN_PASSWORD</code> to your environment, then reload.

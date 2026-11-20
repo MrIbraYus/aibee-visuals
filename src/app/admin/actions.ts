@@ -16,6 +16,7 @@ import { CONTENT_TAG } from "@/lib/content/queries";
 import { listInquiries, readContent, removeProject, setBrands, storageMode, upsertProjects, type StorageMode } from "@/lib/content/store";
 import { brandSchema, projectSchema, type Brand, type Inquiry, type Media, type Project, type SiteContent } from "@/lib/content/types";
 import { deleteMedia, mediaMode, uploadTarget, type MediaMode, type UploadTarget } from "@/lib/media/server";
+import { firebaseAdminConfigured, firebaseAdminError } from "@/lib/server/firebase-admin";
 
 type Result<T = undefined> = { ok: true; data: T } | { ok: false; error: string };
 
@@ -33,6 +34,8 @@ export type AdminState = {
   media: MediaMode;
   login: { google: boolean; password: boolean; pinLength?: number };
   content?: SiteContent;
+  /** Setup problems worth showing on the sign-in screen (missing/broken keys…). */
+  problems: string[];
 };
 
 /* ------------------------------------------------------------------ */
@@ -40,15 +43,49 @@ export type AdminState = {
 /* ------------------------------------------------------------------ */
 
 export async function getAdminState(): Promise<AdminState> {
-  const session = await getSession();
-  const secret = await secretInfo();
+  const problems: string[] = [];
+  const keyError = firebaseAdminError();
+  if (keyError) problems.push(keyError);
+  else if (process.env.VERCEL && !firebaseAdminConfigured()) {
+    problems.push("FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY aren't set in this deployment's environment variables.");
+  }
+
+  let secret: { enabled: boolean; pinLength?: number } = { enabled: false };
+  try {
+    secret = await secretInfo();
+  } catch (err) {
+    problems.push(`Couldn't read the dashboard PIN: ${err instanceof Error ? err.message : String(err)}`);
+  }
+  if (!secret.enabled && !keyError && firebaseAdminConfigured()) {
+    problems.push("No dashboard PIN is saved in Firebase yet. Run: npm run admin:pin -- 1234");
+  }
+
+  let google = false;
+  try {
+    google = googleLoginEnabled();
+  } catch {}
+
+  let session: Awaited<ReturnType<typeof getSession>> = null;
+  try {
+    session = await getSession();
+  } catch {}
+
   const base = {
     storage: storageMode(),
     media: mediaMode(),
-    login: { google: googleLoginEnabled(), password: secret.enabled, pinLength: secret.pinLength },
+    login: { google, password: secret.enabled, pinLength: secret.pinLength },
+    problems,
   };
   if (!session) return { authed: false, ...base };
-  return { authed: true, user: session.sub, ...base, content: await readContent() };
+  try {
+    return { authed: true, user: session.sub, ...base, content: await readContent() };
+  } catch (err) {
+    return {
+      authed: false,
+      ...base,
+      problems: [...problems, `Signed in, but the content couldn't be loaded: ${err instanceof Error ? err.message : String(err)}`],
+    };
+  }
 }
 
 async function clientIp() {
@@ -57,13 +94,18 @@ async function clientIp() {
 }
 
 export async function signInWithPassword(password: string): Promise<Result> {
-  if (!(await secretInfo()).enabled) return { ok: false, error: "No dashboard PIN is set up yet." };
-  const ip = await clientIp();
-  const locked = await lockoutMinutes(ip);
-  if (locked) return { ok: false, error: `Too many wrong tries. Try again in ${locked} minute${locked > 1 ? "s" : ""}.` };
-  const ok = await loginWithPassword(String(password).slice(0, 200));
-  await recordAttempt(ip, ok);
-  return ok ? { ok: true, data: undefined } : { ok: false, error: "That PIN isn't right." };
+  try {
+    if (!(await secretInfo()).enabled) return { ok: false, error: "No dashboard PIN is set up yet." };
+    const ip = await clientIp();
+    const locked = await lockoutMinutes(ip).catch(() => 0);
+    if (locked) return { ok: false, error: `Too many wrong tries. Try again in ${locked} minute${locked > 1 ? "s" : ""}.` };
+    const ok = await loginWithPassword(String(password).slice(0, 200));
+    await recordAttempt(ip, ok).catch(() => {});
+    return ok ? { ok: true, data: undefined } : { ok: false, error: "That PIN isn't right." };
+  } catch (err) {
+    console.error("[admin] sign-in failed", err);
+    return fail(err);
+  }
 }
 
 /** Changes the dashboard PIN (stored hashed in Firebase). */

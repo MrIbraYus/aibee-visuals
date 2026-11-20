@@ -29,15 +29,53 @@ const NAV: NavItem[] = [
 /** Root of the /admin dashboard: sign-in gate + responsive shell. */
 export function AdminApp() {
   const [state, setState] = useState<AdminState | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(async () => setState(await getAdminState()), []);
+  const load = useCallback(async () => {
+    setError(null);
+    try {
+      setState(await getAdminState());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "The dashboard server didn't respond.");
+    }
+  }, []);
+
   useEffect(() => {
     let alive = true;
-    getAdminState().then((s) => alive && setState(s));
+    // Never leave the page spinning: give up after 20s and show why.
+    const timer = window.setTimeout(() => alive && setError("The dashboard is taking too long to respond."), 20000);
+    getAdminState()
+      .then((s) => alive && setState(s))
+      .catch((err) => alive && setError(err instanceof Error ? err.message : "The dashboard server didn't respond."))
+      .finally(() => window.clearTimeout(timer));
     return () => {
       alive = false;
+      window.clearTimeout(timer);
     };
   }, []);
+
+  if (error && !state) {
+    return (
+      <main className="grid min-h-svh place-items-center bg-ink px-5 text-white">
+        <div className="w-full max-w-[420px]">
+          <LogoMark className="size-10" />
+          <h1 className="mt-8 text-[28px] font-semibold leading-[1.1] tracking-[-0.03em]">The dashboard couldn&apos;t load.</h1>
+          <p className="mt-3 break-words rounded-2xl border border-magenta/40 bg-magenta/10 p-4 text-[14px] leading-[1.5]">{error}</p>
+          <p className="mt-3 text-[13px] text-muted">
+            Check your internet connection. On the live site, make sure the environment variables from .env.local are added in
+            Vercel, then redeploy.
+          </p>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="mt-6 w-full rounded-full bg-lime px-5 py-3.5 text-[14px] font-medium text-ink"
+          >
+            Try again
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   if (!state) {
     return (
