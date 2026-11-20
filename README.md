@@ -13,8 +13,9 @@ Production build (needs Node.js 20+): `npm run build` then `npm start`. Also: `b
 
 ## The dashboard (`/admin`)
 
-Sign in at **/admin** with the `ADMIN_PASSWORD` from `.env.local` (or Google, once Firebase is connected
-and your email is in `NEXT_PUBLIC_ADMIN_EMAILS`). Works on phone and desktop.
+Sign in at **/admin** with your **PIN** — it's stored (hashed) in Firebase, so it works on the live site
+with no extra settings. Change it any time with `npm run admin:pin -- 1234`. After 5 wrong tries a device
+is locked out for 15 minutes. Google sign-in also works for the email in `NEXT_PUBLIC_ADMIN_EMAILS`.
 
 | Section | What you manage |
 | --- | --- |
@@ -53,7 +54,7 @@ Your GitHub repo has the site inside the **`aibee-visuals/`** folder, so:
    - Framework preset: **Next.js** (build command and output are detected automatically).
 3. **Environment variables** → paste everything from your `.env.local`
    (Project → Settings → Environment Variables, “Production” + “Preview”).
-   Use a long `ADMIN_PASSWORD` — it's the key to your dashboard on the internet.
+   You don't need `ADMIN_PASSWORD` there — the dashboard PIN lives in Firebase.
 4. **Deploy.** Then set your domain and change `NEXT_PUBLIC_SITE_URL` to it.
 
 ### Make the live dashboard editable

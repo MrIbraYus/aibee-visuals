@@ -1,6 +1,7 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { getAdminAuth } from "@/lib/server/firebase-admin";
+import { verifySecret } from "./pin";
 
 /**
  * Admin sessions: a signed, httpOnly cookie issued after either
@@ -16,7 +17,6 @@ export const adminEmails = () =>
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
 
-export const passwordLoginEnabled = () => Boolean(process.env.ADMIN_PASSWORD);
 export const googleLoginEnabled = () =>
   Boolean(getAdminAuth() && process.env.NEXT_PUBLIC_FIREBASE_API_KEY && adminEmails().length);
 
@@ -67,11 +67,7 @@ export async function requireAdmin(): Promise<AdminSession> {
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export async function loginWithPassword(password: string) {
-  const expected = process.env.ADMIN_PASSWORD;
-  if (!expected) return false;
-  const a = createHash("sha256").update(password).digest();
-  const b = createHash("sha256").update(expected).digest();
-  if (!timingSafeEqual(a, b)) {
+  if (!(await verifySecret(password))) {
     await wait(600); // slow down guessing
     return false;
   }

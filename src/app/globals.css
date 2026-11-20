@@ -92,9 +92,17 @@ img {
   font-weight: 400;
 }
 
-/* Film grain overlay used on dark sections */
+/* Film grain overlay used on dark sections.
+   The container is clipped to its section; the moving noise lives in ::before
+   so it can drift without ever enlarging the page. */
 .grain {
   pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.grain::before {
+  content: "";
   position: absolute;
   inset: -50%;
   width: 200%;
@@ -125,7 +133,7 @@ img {
 .no-scrollbar { scrollbar-width: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .grain { animation: none; }
+  .grain::before { animation: none; }
   *, *::before, *::after {
     scroll-behavior: auto !important;
   }
@@ -172,7 +180,7 @@ html {
     font-size: 16px !important;
   }
   /* Film grain is pretty but costly on phones */
-  .grain {
+  .grain::before {
     animation: none;
     opacity: 0.04;
   }
@@ -191,4 +199,10 @@ html {
 }
 @media (prefers-reduced-motion: reduce) {
   .float-slow { animation: none; }
+}
+
+@keyframes shake {
+  0%, 100% { translate: 0 0; }
+  20%, 60% { translate: -8px 0; }
+  40%, 80% { translate: 8px 0; }
 }

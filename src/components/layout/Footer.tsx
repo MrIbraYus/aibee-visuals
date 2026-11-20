@@ -95,7 +95,7 @@ export function Footer() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-2 py-8 pb-24 text-[12px] text-muted sm:flex-row sm:justify-between sm:pb-8 sm:pr-24">
+        <div className="flex flex-col gap-2 pb-[calc(88px+env(safe-area-inset-bottom))] pt-8 text-[12px] text-muted sm:flex-row sm:justify-between lg:pb-8 lg:pr-24">
           <p>© 2026 Aibee Visuals. All rights reserved.</p>
           <p className="flex flex-wrap gap-x-5 gap-y-1">
             <a href={`mailto:${site.email}`} className="hover:text-white">

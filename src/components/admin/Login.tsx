@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { signInWithGoogle, signInWithPassword, type AdminState } from "@/app/admin/actions";
 import { LogoMark } from "@/components/brand/Logo";
 import { getFirebaseApp } from "@/lib/firebase";
@@ -13,14 +13,32 @@ export function Login({ state, onSuccess }: { state: AdminState; onSuccess: () =
   const [busy, setBusy] = useState(false);
   const noMethod = !state.login.google && !state.login.password;
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const pinLength = state.login.pinLength;
+  const pinRef = useRef<HTMLInputElement>(null);
+
+  const tryLogin = async (value: string) => {
     setBusy(true);
     setError(null);
-    const res = await signInWithPassword(password);
+    const res = await signInWithPassword(value);
     setBusy(false);
-    if (res.ok) onSuccess();
-    else setError(res.error);
+    if (res.ok) return onSuccess();
+    setError(res.error);
+    setPassword("");
+    pinRef.current?.focus();
+  };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password) await tryLogin(password);
+  };
+
+  /** PIN boxes: digits only, signs in as soon as the last digit is typed. */
+  const onPin = (raw: string) => {
+    if (!pinLength) return;
+    const digits = raw.replace(/\D/g, "").slice(0, pinLength);
+    setPassword(digits);
+    setError(null);
+    if (digits.length === pinLength && !busy) void tryLogin(digits);
   };
 
   const google = async () => {
@@ -63,8 +81,8 @@ export function Login({ state, onSuccess }: { state: AdminState; onSuccess: () =
 
         {noMethod && (
           <p className="mt-8 rounded-2xl border border-magenta/40 bg-magenta/10 p-4 text-[14px] leading-[1.5]">
-            No sign-in method is set up yet. Add <code className="text-lime">ADMIN_PASSWORD</code> to your environment
-            variables (see <code>.env.example</code>), then reload.
+            No dashboard PIN is set up yet. Run <code className="text-lime">npm run admin:pin -- 1234</code> (with your
+            own PIN) or add <code className="text-lime">ADMIN_PASSWORD</code> to your environment, then reload.
           </p>
         )}
 
@@ -83,7 +101,48 @@ export function Login({ state, onSuccess }: { state: AdminState; onSuccess: () =
           </div>
         )}
 
-        {state.login.password && (
+        {state.login.password && !!pinLength && (
+          <div className={state.login.google ? "" : "mt-8"}>
+            <label htmlFor="admin-password" className="block text-[12px] font-medium uppercase tracking-[0.06em] text-muted">
+              Enter your PIN
+            </label>
+            <div className="relative mt-3" onClick={() => pinRef.current?.focus()}>
+              <input
+                id="admin-password"
+                ref={pinRef}
+                value={password}
+                onChange={(e) => onPin(e.target.value)}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                autoComplete="current-password"
+                maxLength={pinLength}
+                autoFocus
+                disabled={busy}
+                aria-label={`${pinLength}-digit PIN`}
+                className="absolute inset-0 z-10 w-full cursor-pointer opacity-0"
+              />
+              <div className={`flex gap-3 ${error ? "animate-[shake_0.4s_ease]" : ""}`} aria-hidden>
+                {Array.from({ length: pinLength }, (_, i) => {
+                  const filled = i < password.length;
+                  const current = i === password.length && !busy;
+                  return (
+                    <span
+                      key={i}
+                      className={`grid h-16 flex-1 place-items-center rounded-2xl border text-[28px] transition-colors ${
+                        error ? "border-magenta" : current ? "border-lime" : "border-line"
+                      } bg-ink/60`}
+                    >
+                      {filled ? <span className="size-3.5 rounded-full bg-white" /> : null}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+            <p className="mt-3 text-[13px] text-muted">{busy ? "Checking…" : "You'll be signed in as soon as the PIN is complete."}</p>
+          </div>
+        )}
+
+        {state.login.password && !pinLength && (
           <form onSubmit={submit} className={state.login.google ? "" : "mt-8"}>
             <label className="block text-[12px] font-medium uppercase tracking-[0.06em] text-muted" htmlFor="admin-password">
               Password

@@ -1,6 +1,7 @@
 "use server";
 
 import { updateTag } from "next/cache";
+import { headers } from "next/headers";
 import { z } from "zod";
 import {
   getSession,
@@ -8,9 +9,9 @@ import {
   loginWithGoogle,
   loginWithPassword,
   logout as clearSession,
-  passwordLoginEnabled,
   requireAdmin,
 } from "@/lib/admin/auth";
+import { lockoutMinutes, recordAttempt, saveSecret, secretInfo, verifySecret } from "@/lib/admin/pin";
 import { CONTENT_TAG } from "@/lib/content/queries";
 import { listInquiries, readContent, removeProject, setBrands, storageMode, upsertProjects, type StorageMode } from "@/lib/content/store";
 import { brandSchema, projectSchema, type Brand, type Inquiry, type Media, type Project, type SiteContent } from "@/lib/content/types";
@@ -30,7 +31,7 @@ export type AdminState = {
   user?: string;
   storage: StorageMode;
   media: MediaMode;
-  login: { google: boolean; password: boolean };
+  login: { google: boolean; password: boolean; pinLength?: number };
   content?: SiteContent;
 };
 
@@ -40,19 +41,43 @@ export type AdminState = {
 
 export async function getAdminState(): Promise<AdminState> {
   const session = await getSession();
+  const secret = await secretInfo();
   const base = {
     storage: storageMode(),
     media: mediaMode(),
-    login: { google: googleLoginEnabled(), password: passwordLoginEnabled() },
+    login: { google: googleLoginEnabled(), password: secret.enabled, pinLength: secret.pinLength },
   };
   if (!session) return { authed: false, ...base };
   return { authed: true, user: session.sub, ...base, content: await readContent() };
 }
 
+async function clientIp() {
+  const h = await headers();
+  return h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "local";
+}
+
 export async function signInWithPassword(password: string): Promise<Result> {
-  if (!passwordLoginEnabled()) return { ok: false, error: "Password sign-in is turned off." };
+  if (!(await secretInfo()).enabled) return { ok: false, error: "No dashboard PIN is set up yet." };
+  const ip = await clientIp();
+  const locked = await lockoutMinutes(ip);
+  if (locked) return { ok: false, error: `Too many wrong tries. Try again in ${locked} minute${locked > 1 ? "s" : ""}.` };
   const ok = await loginWithPassword(String(password).slice(0, 200));
-  return ok ? { ok: true, data: undefined } : { ok: false, error: "That password isn't right." };
+  await recordAttempt(ip, ok);
+  return ok ? { ok: true, data: undefined } : { ok: false, error: "That PIN isn't right." };
+}
+
+/** Changes the dashboard PIN (stored hashed in Firebase). */
+export async function changePin(current: string, next: string): Promise<Result> {
+  try {
+    await requireAdmin();
+    if (!(await verifySecret(String(current)))) throw new Error("Your current PIN isn't right.");
+    const value = String(next).trim();
+    if (value.length < 4 || value.length > 64) throw new Error("Use 4 to 64 characters.");
+    await saveSecret(value);
+    return { ok: true, data: undefined };
+  } catch (err) {
+    return fail(err);
+  }
 }
 
 export async function signInWithGoogle(idToken: string): Promise<Result> {
