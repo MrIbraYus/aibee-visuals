@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import type { Website } from "@/lib/content/types";
 import { gsap, SplitText, useGSAP } from "@/lib/gsap";
 import { ArrowUpRight } from "@/components/ui/Primitives";
@@ -9,6 +9,8 @@ import { WebsiteCard } from "@/components/work/WebsiteCard";
 import { whatsappUrl } from "@/lib/contact";
 import { openMessage } from "@/lib/store";
 import { cn, prefersReducedMotion } from "@/lib/utils";
+import { useRail } from "@/lib/useRail";
+import { RailProgress } from "@/components/ui/RailProgress";
 
 /** Lines the first card up with the page grid while the row runs to the screen edge. */
 const RAIL_PAD = "max(var(--gutter), calc((100% - 1312px) / 2))";
@@ -22,9 +24,7 @@ export function Websites({ sites }: { sites: Website[] }) {
   const rail = useRef<HTMLUListElement>(null);
   const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
   const suppressClick = useRef(false);
-  const [edges, setEdges] = useState({ start: true, end: true });
-  const [progress, setProgress] = useState(0);
-  const scrollable = !(edges.start && edges.end);
+  const { progress, start, end, scrollable } = useRail(rail);
 
   useGSAP(
     () => {
@@ -48,24 +48,6 @@ export function Websites({ sites }: { sites: Website[] }) {
     },
     { scope: ref },
   );
-
-  // Track where the row is scrolled to (arrows + progress bar).
-  useEffect(() => {
-    const el = rail.current;
-    if (!el) return;
-    const update = () => {
-      const max = el.scrollWidth - el.clientWidth;
-      setEdges({ start: el.scrollLeft < 8, end: el.scrollLeft > max - 8 });
-      setProgress(max > 0 ? el.scrollLeft / max : 0);
-    };
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    el.addEventListener("scroll", update, { passive: true });
-    return () => {
-      ro.disconnect();
-      el.removeEventListener("scroll", update);
-    };
-  }, []);
 
   const step = (dir: 1 | -1) => {
     const el = rail.current;
@@ -135,7 +117,7 @@ export function Websites({ sites }: { sites: Website[] }) {
                     key={dir}
                     type="button"
                     onClick={() => step(dir)}
-                    disabled={dir === -1 ? edges.start : edges.end}
+                    disabled={dir === -1 ? start : end}
                     aria-label={dir === 1 ? "Next websites" : "Previous websites"}
                     className="grid size-12 place-items-center rounded-full border border-white/20 transition-colors hover:border-lime hover:bg-lime hover:text-ink disabled:pointer-events-none disabled:opacity-30"
                   >
@@ -177,22 +159,7 @@ export function Websites({ sites }: { sites: Website[] }) {
             ))}
           </ul>
 
-          {scrollable && (
-            <div className="frame mt-8 flex items-center gap-4">
-              <div className="relative h-[2px] flex-1 overflow-hidden rounded-full bg-white/12">
-                <span
-                  className="absolute inset-y-0 left-0 rounded-full bg-lime transition-[width] duration-150"
-                  style={{ width: `${Math.max(12, progress * 100)}%` }}
-                />
-              </div>
-              <span className="flex items-center gap-1.5 text-[12px] text-muted lg:hidden">
-                Swipe
-                <svg viewBox="0 0 24 24" className="size-3.5" aria-hidden>
-                  <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
-            </div>
-          )}
+          {scrollable && <RailProgress progress={progress} className="frame mt-8" />}
         </div>
       )}
 

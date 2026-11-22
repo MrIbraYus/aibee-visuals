@@ -10,16 +10,18 @@ import { lenisStore, openMessage, scrollToTarget } from "@/lib/store";
 import { ArrowUpRight, PillButton } from "@/components/ui/Primitives";
 import { ProjectCover } from "@/components/work/ProjectCover";
 import { cn, prefersReducedMotion } from "@/lib/utils";
+import { useRail } from "@/lib/useRail";
+import { RailProgress } from "@/components/ui/RailProgress";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-/** Grid placement per tile, mirroring the Figma bento (desktop). */
+/** Grid placement per tile, mirroring the Figma bento (desktop). Below desktop the tiles form a swipeable row. */
 const layout = [
-  "lg:col-start-1 lg:row-span-2 aspect-[4/3] lg:aspect-auto",
-  "lg:col-start-2 lg:row-start-1 aspect-[16/10] lg:aspect-auto",
-  "lg:col-start-2 lg:row-start-2 aspect-[16/10] lg:aspect-auto",
-  "lg:col-start-3 lg:row-span-2 lg:row-start-1 aspect-[4/5] lg:aspect-auto",
-  "lg:col-start-4 lg:row-span-2 lg:row-start-1 aspect-[4/5] lg:aspect-auto",
+  "lg:col-start-1 lg:row-span-2",
+  "lg:col-start-2 lg:row-start-1",
+  "lg:col-start-2 lg:row-start-2",
+  "lg:col-start-3 lg:row-span-2 lg:row-start-1",
+  "lg:col-start-4 lg:row-span-2 lg:row-start-1",
 ];
 
 function Tile({ project, index, onOpen }: { project: Project; index: number; onOpen: (slug: string) => void }) {
@@ -30,7 +32,7 @@ function Tile({ project, index, onOpen }: { project: Project; index: number; onO
       onClick={() => onOpen(project.slug)}
       data-cursor="View"
       className={cn(
-        "group relative block w-full overflow-hidden rounded-[18px] bg-surface text-left outline-offset-4",
+        "group relative block aspect-[4/5] w-[78vw] shrink-0 snap-start overflow-hidden rounded-[18px] bg-surface text-left outline-offset-4 sm:w-[44vw] lg:aspect-auto lg:w-full lg:shrink",
         layout[index],
       )}
       aria-label={`Open ${project.client}: ${project.title}`}
@@ -46,7 +48,7 @@ function Tile({ project, index, onOpen }: { project: Project; index: number; onO
         <span className="font-semibold">{project.client}</span>
         <span className="serif-i text-[14px] text-white/80">{project.category}</span>
       </div>
-      <div className="absolute inset-x-4 bottom-4 flex translate-y-3 items-end justify-between gap-4 opacity-0 transition-all duration-500 ease-expo group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
+      <div className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-4 transition-all duration-500 ease-expo lg:translate-y-3 lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100 lg:group-focus-visible:translate-y-0 lg:group-focus-visible:opacity-100">
         <p className="serif-i text-[clamp(22px,2vw,30px)] leading-[1] text-white">{project.title}</p>
         <span className="grid size-10 shrink-0 place-items-center rounded-full bg-lime text-ink">
           <ArrowUpRight className="size-4" />
@@ -150,9 +152,11 @@ function QuickView({ project, onClose }: { project: Project; onClose: () => void
   );
 }
 
-/** Selected work — bento grid with an expanding quick view. */
+/** Selected work — bento grid on desktop, a swipeable row on phones and tablets, with an expanding quick view. */
 export function Work({ projects }: { projects: Project[] }) {
   const ref = useRef<HTMLElement>(null);
+  const rail = useRef<HTMLDivElement>(null);
+  const { progress, scrollable } = useRail(rail);
   const [openSlug, setOpenSlug] = useState<string | null>(null);
   const selected = projects.find((p) => p.slug === openSlug) ?? null;
   const close = useCallback(() => setOpenSlug(null), []);
@@ -229,13 +233,15 @@ export function Work({ projects }: { projects: Project[] }) {
         </div>
 
         <div
+          ref={rail}
           data-work-grid
-          className="mt-10 grid gap-3 sm:grid-cols-2 lg:mt-14 lg:h-[clamp(480px,42vw,640px)] lg:grid-cols-[1.75fr_1.55fr_1fr_0.95fr] lg:grid-rows-2"
+          className="-mx-[var(--gutter)] mt-10 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-[var(--gutter)] scroll-px-[var(--gutter)] [scrollbar-width:none] lg:mx-0 lg:mt-14 lg:grid lg:h-[clamp(480px,42vw,640px)] lg:snap-none lg:grid-cols-[1.75fr_1.55fr_1fr_0.95fr] lg:grid-rows-2 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden"
         >
           {projects.map((project, i) => (
             <Tile key={project.slug} project={project} index={i} onOpen={setOpenSlug} />
           ))}
         </div>
+        {scrollable && <RailProgress progress={progress} className="mt-6 lg:hidden" />}
       </div>
 
       {typeof document !== "undefined" &&

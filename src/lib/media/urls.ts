@@ -35,7 +35,7 @@ export function videoPoster(media: Media, width = 1200) {
       : media.poster;
   }
   if (isCloudinary(media.url)) {
-    return `https://res.cloudinary.com/${cloudName}/video/upload/so_0,f_jpg,q_auto,c_limit,w_${width}/${cloudinaryId(media.url)}.jpg`;
+    return `https://res.cloudinary.com/${cloudName}/video/upload/so_30p,f_jpg,q_auto,c_limit,w_${width}/${cloudinaryId(media.url)}.jpg`;
   }
   return undefined;
 }
