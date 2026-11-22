@@ -1,6 +1,6 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
-import { getAdminAuth } from "@/lib/server/firebase-admin";
+import { firebaseProjectId, verifyFirebaseIdToken } from "@/lib/server/verify-firebase-token";
 import { verifySecret } from "./pin";
 
 /**
@@ -18,7 +18,7 @@ export const adminEmails = () =>
     .filter(Boolean);
 
 export const googleLoginEnabled = () =>
-  Boolean(getAdminAuth() && process.env.NEXT_PUBLIC_FIREBASE_API_KEY && adminEmails().length);
+  Boolean(firebaseProjectId() && process.env.NEXT_PUBLIC_FIREBASE_API_KEY && adminEmails().length);
 
 function secret() {
   const s = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD || process.env.FIREBASE_PRIVATE_KEY;
@@ -76,10 +76,9 @@ export async function loginWithPassword(password: string) {
 }
 
 export async function loginWithGoogle(idToken: string) {
-  const auth = getAdminAuth();
-  if (!auth) return { ok: false, error: "Google sign-in isn't configured." };
+  if (!googleLoginEnabled()) return { ok: false, error: "Google sign-in isn't configured." };
   try {
-    const token = await auth.verifyIdToken(idToken);
+    const token = await verifyFirebaseIdToken(idToken);
     const email = token.email?.toLowerCase();
     if (!email || !token.email_verified || !adminEmails().includes(email)) {
       return { ok: false, error: `${token.email ?? "This account"} doesn't have access to the dashboard.` };

@@ -1,5 +1,4 @@
 import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
-import { getAuth, type Auth } from "firebase-admin/auth";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
 
 let app: App | null | undefined;
@@ -67,13 +66,5 @@ export function getAdminDb(): Firestore | null {
   return db;
 }
 
-export function getAdminAuth(): Auth | null {
-  const a = getAdminApp();
-  if (!a) return null;
-  try {
-    return getAuth(a);
-  } catch (err) {
-    console.error("[firebase-admin] Auth couldn't start", err);
-    return null;
-  }
-}
+// Google sign-in tokens are verified in ./verify-firebase-token.ts rather than
+// with firebase-admin/auth, whose dependencies can't load on Vercel.
