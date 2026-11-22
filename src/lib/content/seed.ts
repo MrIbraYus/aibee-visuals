@@ -179,5 +179,6 @@ export function seedContent(): SiteContent {
     brand("omnivest", "Omnivest", 6),
   ];
 
-  return { projects, brands };
+  // Websites and testimonials are added from the dashboard.
+  return { projects, brands, websites: [], testimonials: [] };
 }

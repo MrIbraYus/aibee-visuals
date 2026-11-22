@@ -5,7 +5,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/
 import { navLinks } from "@/content/site";
 import { Logo } from "@/components/brand/Logo";
 import { PillButton, RollText } from "@/components/ui/Primitives";
-import { openProjectDrawer, useIntroDone } from "@/lib/store";
+import { openMessage, useIntroDone } from "@/lib/store";
 import { useSectionNav } from "@/lib/useSectionNav";
 import { ScrollTrigger } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
@@ -98,7 +98,7 @@ export function Nav() {
           </ul>
 
           <div className="flex items-center gap-2">
-            <PillButton onClick={openProjectDrawer} className="hidden rounded-[18px] sm:inline-flex" data-cursor="Say hi">
+            <PillButton onClick={() => openMessage()} className="hidden rounded-[18px] sm:inline-flex" data-cursor="Say hi">
               Let&apos;s Talk
             </PillButton>
             <button
@@ -167,11 +167,11 @@ export function Nav() {
               <PillButton
                 onClick={() => {
                   setOpen(false);
-                  openProjectDrawer();
+                  openMessage();
                 }}
                 className="w-full justify-between"
               >
-                Start a project
+                Send a message
               </PillButton>
             </motion.div>
           </motion.div>

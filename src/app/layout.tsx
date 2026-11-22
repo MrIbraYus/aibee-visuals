@@ -3,7 +3,7 @@ import { Inter, Instrument_Serif, Montserrat } from "next/font/google";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
-import { ProjectDrawer } from "@/components/project/ProjectDrawer";
+import { MessageDrawer } from "@/components/contact/MessageDrawer";
 import { Cursor } from "@/components/ui/Cursor";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { SiteOnly } from "@/components/layout/SiteOnly";
@@ -83,7 +83,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <main id="main">{children}</main>
           <SiteOnly>
             <Footer />
-            <ProjectDrawer />
+            <MessageDrawer />
             <WhatsAppButton />
             <MobileTabBar />
             <Cursor />

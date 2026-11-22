@@ -3,7 +3,7 @@ import path from "node:path";
 import { getAdminDb } from "@/lib/server/firebase-admin";
 import published from "@/content/published.json";
 import { seedContent } from "./seed";
-import type { Brand, Inquiry, Project, SiteContent } from "./types";
+import { normalizeContent, type Brand, type Inquiry, type Project, type SiteContent, type Testimonial, type Website } from "./types";
 
 /**
  * Where portfolio content lives.
@@ -40,8 +40,8 @@ async function writeJson(file: string, data: unknown) {
 
 /** Content published with `bun run content:publish`, else the bundled starter set. */
 function starterContent(): SiteContent {
-  const p = published as unknown as SiteContent | null;
-  return p ? structuredClone(p) : seedContent();
+  const p = published as unknown as Partial<SiteContent> | null;
+  return p ? normalizeContent(structuredClone(p)) : seedContent();
 }
 
 /* --------------------------------- reads -------------------------------- */
@@ -52,14 +52,25 @@ export async function readContent(): Promise<SiteContent> {
     const db = getAdminDb()!;
     const meta = await db.doc("site/meta").get();
     if (!meta.exists) return starterContent();
-    const [projectsSnap, brandsDoc] = await Promise.all([db.collection("projects").get(), db.doc("site/brands").get()]);
+    const [projectsSnap, brandsDoc, websitesDoc, testimonialsDoc] = await Promise.all([
+      db.collection("projects").get(),
+      db.doc("site/brands").get(),
+      db.doc("site/websites").get(),
+      db.doc("site/testimonials").get(),
+    ]);
+    const starter = websitesDoc.exists && testimonialsDoc.exists ? null : starterContent();
     return {
       projects: projectsSnap.docs.map((d) => d.data() as Project),
       brands: ((brandsDoc.data()?.items as Brand[]) ?? []).filter(Boolean),
+      websites: websitesDoc.exists ? ((websitesDoc.data()?.items as Website[]) ?? []).filter(Boolean) : starter!.websites,
+      testimonials: testimonialsDoc.exists
+        ? ((testimonialsDoc.data()?.items as Testimonial[]) ?? []).filter(Boolean)
+        : starter!.testimonials,
     };
   }
   if (mode === "local") {
-    return (await readJson<SiteContent>(CONTENT_FILE)) ?? starterContent();
+    const saved = await readJson<Partial<SiteContent>>(CONTENT_FILE);
+    return saved ? normalizeContent(saved) : starterContent();
   }
   return starterContent();
 }
@@ -76,8 +87,8 @@ function assertWritable() {
 async function ensureInitialised(): Promise<SiteContent> {
   const mode = storageMode();
   if (mode === "local") {
-    const existing = await readJson<SiteContent>(CONTENT_FILE);
-    if (existing) return existing;
+    const existing = await readJson<Partial<SiteContent>>(CONTENT_FILE);
+    if (existing) return normalizeContent(existing);
     const seed = starterContent();
     await writeJson(CONTENT_FILE, seed);
     return seed;
@@ -89,6 +100,8 @@ async function ensureInitialised(): Promise<SiteContent> {
   const batch = db.batch();
   for (const p of seed.projects) batch.set(db.collection("projects").doc(p.id), p);
   batch.set(db.doc("site/brands"), { items: seed.brands });
+  batch.set(db.doc("site/websites"), { items: seed.websites });
+  batch.set(db.doc("site/testimonials"), { items: seed.testimonials });
   batch.set(db.doc("site/meta"), { initialisedAt: Date.now() });
   await batch.commit();
   return seed;
@@ -129,6 +142,26 @@ export async function setBrands(brands: Brand[]) {
   await getAdminDb()!.doc("site/brands").set({ items: brands });
 }
 
+export async function setWebsites(websites: Website[]) {
+  assertWritable();
+  const current = await ensureInitialised();
+  if (storageMode() === "local") {
+    await writeJson(CONTENT_FILE, { ...current, websites });
+    return;
+  }
+  await getAdminDb()!.doc("site/websites").set({ items: websites });
+}
+
+export async function setTestimonials(testimonials: Testimonial[]) {
+  assertWritable();
+  const current = await ensureInitialised();
+  if (storageMode() === "local") {
+    await writeJson(CONTENT_FILE, { ...current, testimonials });
+    return;
+  }
+  await getAdminDb()!.doc("site/testimonials").set({ items: testimonials });
+}
+
 /* ------------------------------- inquiries ------------------------------ */
 
 export async function saveInquiry(inquiry: Omit<Inquiry, "id">): Promise<string> {
@@ -161,4 +194,59 @@ export async function listInquiries(): Promise<Inquiry[]> {
   }
   if (mode === "local") return (await readJson<Inquiry[]>(INQUIRIES_FILE)) ?? [];
   return [];
+}
+
+export async function updateInquiry(id: string, patch: Pick<Inquiry, "status">) {
+  const mode = storageMode();
+  if (mode === "firestore") {
+    await getAdminDb()!.collection("inquiries").doc(id).update(patch);
+    return;
+  }
+  if (mode === "local") {
+    const list = (await readJson<Inquiry[]>(INQUIRIES_FILE)) ?? [];
+    await writeJson(INQUIRIES_FILE, list.map((i) => (i.id === id ? { ...i, ...patch } : i)));
+  }
+}
+
+export async function deleteInquiry(id: string) {
+  const mode = storageMode();
+  if (mode === "firestore") {
+    await getAdminDb()!.collection("inquiries").doc(id).delete();
+    return;
+  }
+  if (mode === "local") {
+    const list = (await readJson<Inquiry[]>(INQUIRIES_FILE)) ?? [];
+    await writeJson(INQUIRIES_FILE, list.filter((i) => i.id !== id));
+  }
+}
+
+export type UnreadSummary = { count: number; latest?: Pick<Inquiry, "id" | "name" | "message" | "createdAt"> };
+
+/** How many messages are unread, plus the newest one (for notifications). */
+export async function unreadInquiries(): Promise<UnreadSummary> {
+  const mode = storageMode();
+  if (mode === "firestore") {
+    const col = getAdminDb()!.collection("inquiries");
+    const [count, latest] = await Promise.all([
+      col.where("status", "==", "new").count().get(),
+      col.orderBy("createdAt", "desc").limit(1).get(),
+    ]);
+    const doc = latest.docs[0];
+    const data = doc?.data();
+    return {
+      count: count.data().count,
+      latest: doc
+        ? { id: doc.id, name: String(data?.name ?? ""), message: String(data?.message ?? ""), createdAt: Number(data?.createdAt ?? 0) }
+        : undefined,
+    };
+  }
+  if (mode === "local") {
+    const list = (await readJson<Inquiry[]>(INQUIRIES_FILE)) ?? [];
+    const latest = list[0];
+    return {
+      count: list.filter((i) => i.status === "new").length,
+      latest: latest ? { id: latest.id, name: latest.name, message: latest.message, createdAt: latest.createdAt } : undefined,
+    };
+  }
+  return { count: 0 };
 }

@@ -14,17 +14,32 @@ import { ProjectEditor } from "./views/ProjectEditor";
 import { HeroView } from "./views/Hero";
 import { BrandsView } from "./views/Brands";
 import { MotionView } from "./views/Motion";
-import { BriefsView } from "./views/Briefs";
+import { MessagesView } from "./views/Messages";
+import { WebsitesView } from "./views/Websites";
+import { TestimonialsView } from "./views/Testimonials";
 
 type NavItem = { view: View["name"]; label: string; icon: Parameters<typeof Icon>[0]["name"] };
 const NAV: NavItem[] = [
   { view: "overview", label: "Overview", icon: "grid" },
   { view: "projects", label: "Projects", icon: "folder" },
+  { view: "websites", label: "Websites", icon: "globe" },
   { view: "hero", label: "Hero", icon: "star" },
   { view: "brands", label: "Brands", icon: "badge" },
   { view: "motion", label: "Motion", icon: "play" },
-  { view: "briefs", label: "Briefs", icon: "inbox" },
+  { view: "testimonials", label: "Testimonials", icon: "quote" },
+  { view: "messages", label: "Messages", icon: "inbox" },
 ];
+/** Phone bottom bar; the rest live in the top-right menu. */
+const TABS: View["name"][] = ["overview", "projects", "websites", "motion", "messages"];
+
+function Badge({ n, className }: { n: number; className?: string }) {
+  if (!n) return null;
+  return (
+    <span className={cn("grid h-[18px] min-w-[18px] place-items-center rounded-full bg-magenta px-1 text-[11px] font-semibold leading-none text-white tabular-nums", className)}>
+      {n > 99 ? "99+" : n}
+    </span>
+  );
+}
 
 /** Root of the /admin dashboard: sign-in gate + responsive shell. */
 export function AdminApp() {
@@ -126,7 +141,7 @@ function ModeBanner() {
 }
 
 function Shell({ onSignOut }: { onSignOut: () => void }) {
-  const { view, go, state, content } = useAdmin();
+  const { view, go, state, content, unread } = useAdmin();
   const [menu, setMenu] = useState(false);
   const active: View["name"] = view.name === "project" ? "projects" : view.name;
 
@@ -135,6 +150,8 @@ function Shell({ onSignOut }: { onSignOut: () => void }) {
     hero: content.projects.flatMap((p) => p.assets).filter((a) => a.hero).length,
     brands: content.brands.length,
     motion: content.projects.flatMap((p) => p.assets).filter((a) => a.type === "motion").length,
+    websites: content.websites.length,
+    testimonials: content.testimonials.length,
   };
 
   return (
@@ -164,7 +181,11 @@ function Shell({ onSignOut }: { onSignOut: () => void }) {
             >
               <Icon name={item.icon} className={active === item.view ? "text-lime" : ""} />
               <span className="flex-1 text-left">{item.label}</span>
-              {counts[item.view] !== undefined && <span className="text-[12px] tabular-nums text-dim">{counts[item.view]}</span>}
+              {item.view === "messages" ? (
+                <Badge n={unread} />
+              ) : (
+                counts[item.view] !== undefined && <span className="text-[12px] tabular-nums text-dim">{counts[item.view]}</span>
+              )}
             </button>
           ))}
         </nav>
@@ -197,9 +218,20 @@ function Shell({ onSignOut }: { onSignOut: () => void }) {
       </header>
       {menu && (
         <div className="fixed inset-x-3 top-16 z-50 rounded-2xl border border-line bg-surface p-2 shadow-2xl lg:hidden">
-          <button type="button" onClick={() => { setMenu(false); go({ name: "briefs" }); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-[14px] hover:bg-white/5">
-            <Icon name="inbox" /> Briefs
-          </button>
+          {NAV.filter((item) => !TABS.includes(item.view)).map((item) => (
+            <button
+              key={item.view}
+              type="button"
+              onClick={() => {
+                setMenu(false);
+                go({ name: item.view } as View);
+              }}
+              className={cn("flex w-full items-center gap-3 rounded-xl px-3 py-3 text-[14px] hover:bg-white/5", active === item.view && "text-lime")}
+            >
+              <Icon name={item.icon} /> {item.label}
+            </button>
+          ))}
+          <div className="my-1 h-px bg-line" />
           <Link href="/" target="_blank" className="flex items-center gap-3 rounded-xl px-3 py-3 text-[14px] hover:bg-white/5">
             <Icon name="external" /> View website
           </Link>
@@ -218,7 +250,9 @@ function Shell({ onSignOut }: { onSignOut: () => void }) {
           {view.name === "hero" && <HeroView />}
           {view.name === "brands" && <BrandsView />}
           {view.name === "motion" && <MotionView />}
-          {view.name === "briefs" && <BriefsView />}
+          {view.name === "websites" && <WebsitesView />}
+          {view.name === "testimonials" && <TestimonialsView />}
+          {view.name === "messages" && <MessagesView />}
         </div>
       </main>
 
@@ -227,16 +261,17 @@ function Shell({ onSignOut }: { onSignOut: () => void }) {
         aria-label="Dashboard"
         className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-line bg-ink/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
       >
-        {NAV.slice(0, 5).map((item) => (
+        {NAV.filter((item) => TABS.includes(item.view)).map((item) => (
           <button
             key={item.view}
             type="button"
             onClick={() => go({ name: item.view } as View)}
             aria-current={active === item.view ? "page" : undefined}
-            className={cn("flex flex-col items-center gap-1 py-2.5 text-[11px]", active === item.view ? "text-lime" : "text-white/55")}
+            className={cn("relative flex flex-col items-center gap-1 py-2.5 text-[11px]", active === item.view ? "text-lime" : "text-white/55")}
           >
             <Icon name={item.icon} className="size-5" />
             {item.label}
+            {item.view === "messages" && <Badge n={unread} className="absolute left-1/2 top-1 ml-1.5" />}
           </button>
         ))}
       </nav>

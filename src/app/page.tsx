@@ -7,6 +7,8 @@ import { Manifesto } from "@/components/sections/Manifesto";
 import { MotionReel } from "@/components/sections/MotionReel";
 import { Approach } from "@/components/sections/Approach";
 import { Contact } from "@/components/sections/Contact";
+import { Websites } from "@/components/sections/Websites";
+import { Testimonials } from "@/components/sections/Testimonials";
 import { Preloader } from "@/components/ui/Preloader";
 import { getHomeData } from "@/lib/content/queries";
 import { coverOf } from "@/lib/content/types";
@@ -25,7 +27,7 @@ const jsonLd = {
 };
 
 export default async function Home() {
-  const { projects, brands, featured, hero, motion } = await getHomeData();
+  const { projects, brands, websites, testimonials, featured, hero, motion } = await getHomeData();
 
   // Hero arc: the images you picked in the dashboard, else every project cover.
   const arc = (hero.length ? hero.map((h) => ({ asset: h.asset, project: h.project })) : projects.map((p) => ({ asset: coverOf(p), project: p })))
@@ -43,9 +45,11 @@ export default async function Home() {
       <Studio />
       <Services />
       <Work projects={featured.length ? featured : projects.slice(0, 5)} />
+      {websites.length > 0 && <Websites sites={websites} />}
       <Gallery projects={projects} />
       <Manifesto images={arc.slice(0, 3).map((a) => a.src)} />
       <MotionReel items={motion} />
+      {testimonials.length > 0 && <Testimonials items={testimonials} />}
       <Approach />
       <Contact />
     </>

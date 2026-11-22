@@ -16,6 +16,8 @@ export async function getSiteContent(): Promise<SiteContent> {
   return {
     projects: sortByOrder(content.projects.filter((p) => p.published)),
     brands: sortByOrder(content.brands),
+    websites: sortByOrder(content.websites.filter((w) => w.published)),
+    testimonials: sortByOrder(content.testimonials.filter((t) => t.published)),
   };
 }
 
@@ -27,10 +29,12 @@ export async function getProjectBySlug(slug: string): Promise<{ project: Project
 }
 
 export async function getHomeData() {
-  const { projects, brands } = await getSiteContent();
+  const { projects, brands, websites, testimonials } = await getSiteContent();
   return {
     projects,
     brands,
+    websites,
+    testimonials,
     featured: projects.filter((p) => p.featured).slice(0, 5),
     hero: heroItemsOf(projects),
     motion: motionItemsOf(projects),

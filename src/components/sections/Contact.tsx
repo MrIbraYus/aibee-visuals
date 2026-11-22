@@ -4,8 +4,7 @@ import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
 import { site } from "@/content/site";
 import { gsap, ScrollTrigger, SplitText, useGSAP } from "@/lib/gsap";
-import { openProjectDrawer } from "@/lib/store";
-import { Magnetic, PillButton } from "@/components/ui/Primitives";
+import { MessageForm } from "@/components/contact/MessageForm";
 import { isFinePointer, prefersReducedMotion } from "@/lib/utils";
 import { telUrl, whatsappUrl } from "@/lib/contact";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
@@ -105,7 +104,7 @@ export function Contact() {
           className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full bg-[radial-gradient(circle,rgba(18,97,245,0.55),transparent_68%)] blur-2xl"
         />
       )}
-      <div className="frame relative grid items-center gap-10 py-[clamp(72px,8vw,120px)] lg:grid-cols-12">
+      <div className="frame relative grid items-start gap-10 py-[clamp(72px,8vw,120px)] lg:grid-cols-12 lg:gap-y-14">
         <h2 ref={headingRef} className="text-white lg:col-span-8" aria-label="Have a good idea? Let's make it matter.">
           <span
             data-cta-line
@@ -123,14 +122,14 @@ export function Contact() {
           </span>
         </h2>
 
-        <div className="relative z-10 flex flex-col items-start gap-6 lg:col-span-4">
-          <div data-cta-side>
-            <Magnetic strength={0.3}>
-              <PillButton onClick={openProjectDrawer} className="px-8 py-5 text-[16px]" data-cursor="Let's go">
-                Start a project
-              </PillButton>
-            </Magnetic>
-          </div>
+        <div data-cta-side className="relative z-10 lg:col-span-6 lg:row-start-2">
+          <MessageForm />
+        </div>
+
+        <div className="relative z-10 flex flex-col items-start gap-6 lg:col-span-3 lg:col-start-8 lg:row-start-2">
+          <p data-cta-side className="max-w-[28ch] text-[15px] leading-[1.55] text-muted">
+            Prefer to talk right now? Chat with us on WhatsApp, call, or send an email.
+          </p>
           <div data-cta-side>
             <a
               href={whatsappUrl("Hi Aibee Visuals! I'd like to talk about a project.")}

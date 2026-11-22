@@ -2,8 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import type { AdminState } from "@/app/admin/actions";
-import type { SiteContent } from "@/lib/content/types";
+import { getUnread, type AdminState } from "@/app/admin/actions";
+import { normalizeContent, type SiteContent } from "@/lib/content/types";
 
 export type View =
   | { name: "overview" }
@@ -12,7 +12,9 @@ export type View =
   | { name: "hero" }
   | { name: "brands" }
   | { name: "motion" }
-  | { name: "briefs" };
+  | { name: "websites" }
+  | { name: "testimonials" }
+  | { name: "messages" };
 
 type Toast = { id: number; tone: "ok" | "error"; text: string };
 type ConfirmRequest = { title: string; body?: string; action: string; danger?: boolean; resolve: (ok: boolean) => void };
@@ -27,6 +29,11 @@ type Ctx = {
   confirm: (opts: Omit<ConfirmRequest, "resolve">) => Promise<boolean>;
   canWrite: boolean;
   canUpload: boolean;
+  /** Unread website messages (badge in the menu). */
+  unread: number;
+  setUnread: (n: number) => void;
+  /** Bumps when a new message arrives, so the inbox reloads. */
+  inboxVersion: number;
 };
 
 const AdminCtx = createContext<Ctx | null>(null);
@@ -42,16 +49,20 @@ const toHash = (v: View) => (v.name === "project" ? `#project/${v.id}` : v.name 
 function fromHash(hash: string): View {
   const h = hash.replace(/^#/, "");
   if (h.startsWith("project/")) return { name: "project", id: h.slice(8) };
-  if (["projects", "hero", "brands", "motion", "briefs"].includes(h)) return { name: h } as View;
+  if (h === "briefs") return { name: "messages" };
+  if (["projects", "hero", "brands", "motion", "websites", "testimonials", "messages"].includes(h)) return { name: h } as View;
   return { name: "overview" };
 }
 
 export function AdminProvider({ initial, children }: { initial: AdminState; children: ReactNode }) {
-  const [content, setContentState] = useState<SiteContent>(initial.content ?? { projects: [], brands: [] });
+  const [content, setContentState] = useState<SiteContent>(initial.content ?? normalizeContent(null));
   const [view, setView] = useState<View>(() => (typeof window === "undefined" ? { name: "overview" } : fromHash(window.location.hash)));
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [confirmReq, setConfirmReq] = useState<ConfirmRequest | null>(null);
+  const [unread, setUnread] = useState(initial.unread ?? 0);
+  const [inboxVersion, setInboxVersion] = useState(0);
   const toastId = useRef(0);
+  const newest = useRef<number | null>(null);
 
   useEffect(() => {
     const onHash = () => setView(fromHash(window.location.hash));
@@ -79,6 +90,39 @@ export function AdminProvider({ initial, children }: { initial: AdminState; chil
 
   const setContent = useCallback((updater: (c: SiteContent) => SiteContent) => setContentState(updater), []);
 
+  // Check for new messages while the dashboard is open.
+  useEffect(() => {
+    let alive = true;
+    const poll = async () => {
+      if (document.hidden) return;
+      const res = await getUnread().catch(() => null);
+      if (!alive || !res?.ok) return;
+      const { count, latest } = res.data;
+      setUnread(count);
+      const at = latest?.createdAt ?? 0;
+      if (newest.current !== null && at > newest.current && latest) {
+        toast(`New message from ${latest.name}`);
+        setInboxVersion((v) => v + 1);
+      }
+      newest.current = Math.max(newest.current ?? 0, at);
+    };
+    poll();
+    const id = window.setInterval(poll, 30_000);
+    const onVisible = () => !document.hidden && poll();
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      alive = false;
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [toast]);
+
+  // "(2) Studio dashboard" in the browser tab when messages are waiting.
+  useEffect(() => {
+    const base = document.title.replace(/^\(\d+\)\s*/, "");
+    document.title = unread > 0 ? `(${unread}) ${base}` : base;
+  }, [unread]);
+
   const value = useMemo<Ctx>(
     () => ({
       state: initial,
@@ -90,8 +134,11 @@ export function AdminProvider({ initial, children }: { initial: AdminState; chil
       confirm,
       canWrite: initial.storage !== "readonly",
       canUpload: initial.media !== "none",
+      unread,
+      setUnread,
+      inboxVersion,
     }),
-    [initial, content, setContent, view, go, toast, confirm],
+    [initial, content, setContent, view, go, toast, confirm, unread, inboxVersion],
   );
 
   return (

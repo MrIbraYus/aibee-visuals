@@ -28,12 +28,14 @@ export const introStore = createStore(false);
 export const useIntroDone = () =>
   useSyncExternalStore(introStore.subscribe, introStore.get, () => false);
 
-/** "Start a project" drawer. */
-export const projectDrawerStore = createStore(false);
-export const useProjectDrawer = () =>
-  useSyncExternalStore(projectDrawerStore.subscribe, projectDrawerStore.get, () => false);
-export const openProjectDrawer = () => projectDrawerStore.set(true);
-export const closeProjectDrawer = () => projectDrawerStore.set(false);
+/** "Send a message" drawer. `topic` pre-fills what the visitor is asking about. */
+type MessageDrawer = { open: boolean; topic?: string };
+const CLOSED: MessageDrawer = { open: false };
+export const messageDrawerStore = createStore<MessageDrawer>(CLOSED);
+export const useMessageDrawer = () =>
+  useSyncExternalStore(messageDrawerStore.subscribe, messageDrawerStore.get, () => CLOSED);
+export const openMessage = (topic?: string) => messageDrawerStore.set({ open: true, topic });
+export const closeMessage = () => messageDrawerStore.set(CLOSED);
 
 /** Smooth-scroll instance (Lenis) so any component can scrollTo. */
 export const lenisStore = createStore<Lenis | null>(null);

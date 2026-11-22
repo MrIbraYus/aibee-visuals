@@ -18,7 +18,12 @@ import path from "node:path";
 import { v2 as cloudinary } from "cloudinary";
 
 type Media = { url: string; kind: "image" | "video"; poster?: string; [k: string]: unknown };
-type Content = { projects: { id: string; assets: { media: Media }[] }[]; brands: { logo?: Media }[] };
+type Content = {
+  projects: { id: string; assets: { media: Media }[] }[];
+  brands: { logo?: Media }[];
+  websites?: { image?: Media }[];
+  testimonials?: { avatar?: Media }[];
+};
 
 const root = process.cwd();
 const contentFile = path.join(root, ".data", "content.json");
@@ -74,6 +79,14 @@ for (const project of content.projects) {
 for (const brand of content.brands) {
   if (brand.logo) brand.logo.url = (await toCloud(brand.logo.url, "image"))!;
 }
+content.websites ??= [];
+content.testimonials ??= [];
+for (const site of content.websites) {
+  if (site.image) site.image.url = (await toCloud(site.image.url, "image"))!;
+}
+for (const t of content.testimonials) {
+  if (t.avatar) t.avatar.url = (await toCloud(t.avatar.url, "image"))!;
+}
 
 await writeFile(contentFile, JSON.stringify(content, null, 2));
 await writeFile(publishedFile, JSON.stringify(content, null, 2) + "\n");
@@ -85,12 +98,14 @@ if (FIREBASE_PROJECT_ID && FIREBASE_CLIENT_EMAIL && FIREBASE_PRIVATE_KEY) {
   const { cert, initializeApp } = await import("firebase-admin/app");
   const { getFirestore } = await import("firebase-admin/firestore");
   const app = initializeApp({
-    credential: cert({ projectId: FIREBASE_PROJECT_ID, clientEmail: FIREBASE_CLIENT_EMAIL, privateKey: FIREBASE_PRIVATE_KEY.replace(/\n/g, "\n") }),
+    credential: cert({ projectId: FIREBASE_PROJECT_ID, clientEmail: FIREBASE_CLIENT_EMAIL, privateKey: FIREBASE_PRIVATE_KEY.trim().replace(/^"|"$/g, "").replace(/\\n/g, "\n") }),
   });
   const db = getFirestore(app);
   const batch = db.batch();
   for (const p of content.projects) batch.set(db.collection("projects").doc(p.id), p);
   batch.set(db.doc("site/brands"), { items: content.brands });
+  batch.set(db.doc("site/websites"), { items: content.websites });
+  batch.set(db.doc("site/testimonials"), { items: content.testimonials });
   batch.set(db.doc("site/meta"), { initialisedAt: Date.now() });
   await batch.commit();
   console.log(`✓ Copied ${content.projects.length} projects and ${content.brands.length} brands to Firestore`);

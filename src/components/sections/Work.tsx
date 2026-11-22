@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Project } from "@/lib/content/types";
 import { gsap, SplitText, useGSAP } from "@/lib/gsap";
-import { lenisStore, openProjectDrawer } from "@/lib/store";
+import { lenisStore, openMessage } from "@/lib/store";
 import { ArrowUpRight, PillButton } from "@/components/ui/Primitives";
 import { ProjectCover } from "@/components/work/ProjectCover";
 import { cn, prefersReducedMotion } from "@/lib/utils";
@@ -138,10 +138,10 @@ function QuickView({ project, onClose }: { project: Project; onClose: () => void
             <PillButton
               onClick={() => {
                 onClose();
-                openProjectDrawer();
+                openMessage(`A project like ${project.client}`);
               }}
             >
-              Start a similar project
+              Ask about a similar project
             </PillButton>
           </div>
         </motion.div>

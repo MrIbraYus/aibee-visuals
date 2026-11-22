@@ -5,7 +5,7 @@ import { useAdmin } from "../AdminContext";
 import { Button, Icon, PageHeader, Panel, Thumb } from "../ui";
 
 export function Overview() {
-  const { content, go, state } = useAdmin();
+  const { content, go, state, unread } = useAdmin();
   const assets = content.projects.flatMap((p) => p.assets);
   const stats = [
     { label: "Projects", value: content.projects.length, hint: `${content.projects.filter((p) => p.published).length} live`, view: "projects" as const },
@@ -13,6 +13,9 @@ export function Overview() {
     { label: "Hero images", value: assets.filter((a) => a.hero).length, hint: "On the homepage arc", view: "hero" as const },
     { label: "Brands", value: content.brands.length, hint: "In the logo strip", view: "brands" as const },
     { label: "Motion pieces", value: motionItemsOf(content.projects).length, hint: "Videos & animations", view: "motion" as const },
+    { label: "Websites", value: content.websites.length, hint: `${content.websites.filter((w) => w.published).length} live`, view: "websites" as const },
+    { label: "Testimonials", value: content.testimonials.length, hint: `${content.testimonials.filter((t) => t.published).length} live`, view: "testimonials" as const },
+    { label: "Unread messages", value: unread, hint: "From the contact form", view: "messages" as const },
   ];
   const recent = content.projects
     .flatMap((p) => p.assets.map((a) => ({ a, p })))
@@ -27,7 +30,7 @@ export function Overview() {
             Good to see you<span className="serif-i font-normal">.</span>
           </>
         }
-        subtitle="Everything on the website — projects, hero images, brand logos and motion — is managed from here."
+        subtitle="Everything on the website — projects, websites, hero images, brand logos, motion and testimonials — is managed from here."
         actions={
           <Button tone="primary" onClick={() => go({ name: "project", id: "new" })}>
             <Icon name="plus" /> New project
@@ -35,7 +38,7 @@ export function Overview() {
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {stats.map((s) => (
           <button
             key={s.label}
@@ -84,7 +87,9 @@ export function Overview() {
               { label: "Choose hero images", body: "Pick what rides the homepage arc", onClick: () => go({ name: "hero" }) },
               { label: "Update brand logos", body: "The “brands we’ve helped” strip", onClick: () => go({ name: "brands" }) },
               { label: "Add motion work", body: "Logo animations, motion graphics, videos", onClick: () => go({ name: "motion" }) },
-              { label: "Read project briefs", body: "Messages from the Start a project form", onClick: () => go({ name: "briefs" }) },
+              { label: "Add a website", body: "Screenshot, description and link", onClick: () => go({ name: "websites" }) },
+              { label: "Add a testimonial", body: "What a client said about you", onClick: () => go({ name: "testimonials" }) },
+              { label: "Read messages", body: unread ? `${unread} unread from the contact form` : "From the website's contact form", onClick: () => go({ name: "messages" }) },
             ].map((q) => (
               <li key={q.label}>
                 <button type="button" onClick={q.onClick} className="flex w-full items-center justify-between gap-4 py-3.5 text-left">

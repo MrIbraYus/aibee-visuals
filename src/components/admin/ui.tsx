@@ -29,6 +29,11 @@ const paths = {
   drag: "M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01",
   menu: "M4 7h16M4 12h16M4 17h16",
   cover: "M4 5h16v14H4zM8 15l2.5-3 2 2.5L15 11l3 4",
+  globe: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM3.5 9h17M3.5 15h17M12 3c2.5 2.6 3.6 5.6 3.6 9s-1.1 6.4-3.6 9c-2.5-2.6-3.6-5.6-3.6-9S9.5 5.6 12 3z",
+  quote: "M5 17.5c2.6-.6 4-2.6 4-5.5V7H5v5h3M14 17.5c2.6-.6 4-2.6 4-5.5V7h-4v5h3",
+  bell: "M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15zM10 20a2 2 0 0 0 4 0",
+  mail: "M3.5 6h17v12h-17zM4 7l8 6 8-6",
+  whatsapp: "M4 20l1.3-4A8 8 0 1 1 8 18.8zM9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.6-2-1-1 .9a5 5 0 0 1-2.8-2.8l.9-1-1-2z",
 };
 
 export function Icon({ name, className }: { name: keyof typeof paths; className?: string }) {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { openProjectDrawer, useIntroDone, useProjectDrawer } from "@/lib/store";
+import { openMessage, useIntroDone, useMessageDrawer } from "@/lib/store";
 import { whatsappUrl } from "@/lib/contact";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import { cn } from "@/lib/utils";
@@ -25,7 +25,7 @@ function Glyph({ d, filled }: { d: string; filled?: boolean }) {
 export function MobileTabBar() {
   const pathname = usePathname() ?? "/";
   const introDone = useIntroDone();
-  const drawerOpen = useProjectDrawer();
+  const drawerOpen = useMessageDrawer().open;
   if (drawerOpen) return null;
 
   const tabs = [
@@ -61,15 +61,15 @@ export function MobileTabBar() {
         <li className="flex justify-center">
           <button
             type="button"
-            onClick={openProjectDrawer}
+            onClick={() => openMessage()}
             className="flex w-full flex-col items-center gap-1 py-1.5 text-[10.5px] font-medium text-white/60 active:text-white"
           >
             <span className="grid size-[22px] place-items-center rounded-full bg-lime text-ink">
               <svg viewBox="0 0 24 24" className="size-3.5" aria-hidden>
-                <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+                <path d="M5 6h14v9H9l-4 3.5z" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" />
               </svg>
             </span>
-            Start
+            Message
           </button>
         </li>
         <li className="flex justify-center">

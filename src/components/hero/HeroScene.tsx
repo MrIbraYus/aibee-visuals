@@ -3,15 +3,15 @@
 import dynamic from "next/dynamic";
 import { getImageProps } from "next/image";
 import { useCallback, useRef } from "react";
-import { heroPills } from "@/content/site";
 import type { Brand } from "@/lib/content/types";
 import { whatsappUrl } from "@/lib/contact";
 import { gsap, ScrollTrigger, SplitText, useGSAP } from "@/lib/gsap";
 import { scrollToTarget, useIntroDone } from "@/lib/store";
-import { clamp, cn, easeInOutCubic, lerp, prefersReducedMotion, progress } from "@/lib/utils";
+import { clamp, easeInOutCubic, lerp, prefersReducedMotion, progress } from "@/lib/utils";
 import { ArcMarquee, type ArcItem, type ArcMarqueeHandle } from "./ArcMarquee";
 import { imageProps } from "@/lib/media/urls";
 import { LogoStrip } from "./LogoStrip";
+import { ServicePills } from "./ServicePills";
 
 const HeroRibbons = dynamic(() => import("@/components/three/HeroRibbons"), { ssr: false });
 import { useIsDesktop } from "@/lib/useMedia";
@@ -259,24 +259,7 @@ export function HeroScene({ items, brands }: { items: ArcItem[]; brands: Brand[]
               We combine strategic thinking, bold creativity and digital expertise to help businesses build distinctive
               brands and meaningful digital experiences.
             </p>
-            <div ref={pillsRef} className="mt-[clamp(18px,3.6svh,52px)] flex flex-wrap justify-center gap-2.5 sm:gap-4">
-              {heroPills.map((pill, i) => (
-                <button
-                  key={pill.label}
-                  type="button"
-                  data-pill
-                  onClick={() => scrollToTarget(pill.href, -20)}
-                  className={cn(
-                    "h-10 rounded-3xl px-4 text-[13px] leading-[1.6] transition-[scale,rotate] duration-500 ease-expo sm:h-11 sm:w-[150px] sm:text-sm",
-                    i % 2 ? "hover:rotate-[4deg]" : "hover:-rotate-[4deg]",
-                    "hover:scale-[1.06]",
-                    pill.className,
-                  )}
-                >
-                  {pill.label}
-                </button>
-              ))}
-            </div>
+            <ServicePills ref={pillsRef} active={introDone} />
           </div>
 
           {/* The arc */}

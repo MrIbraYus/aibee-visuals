@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
 import { services, type Service } from "@/content/site";
 import { gsap, SplitText, useGSAP } from "@/lib/gsap";
-import { openProjectDrawer } from "@/lib/store";
+import { openMessage } from "@/lib/store";
 import { ArrowUpRight } from "@/components/ui/Primitives";
 import { cn, prefersReducedMotion } from "@/lib/utils";
 
@@ -105,8 +105,8 @@ function ServiceColumn({ service }: { service: Service }) {
 
       <button
         type="button"
-        onClick={openProjectDrawer}
-        aria-label={`Start a ${service.title} project`}
+        onClick={() => openMessage(service.title)}
+        aria-label={`Ask about ${service.title}`}
         className="mt-4 w-fit text-lime transition-transform duration-500 ease-expo group-hover:rotate-45"
       >
         <ArrowUpRight className="size-[18px]" />

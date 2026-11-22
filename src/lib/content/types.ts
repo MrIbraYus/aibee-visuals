@@ -95,19 +95,62 @@ export const brandSchema = z.object({
 });
 export type Brand = z.infer<typeof brandSchema>;
 
-export type SiteContent = { projects: Project[]; brands: Brand[] };
+/** A website you designed or built — shown in the homepage websites section. */
+export const websiteSchema = z.object({
+  id: z.string().min(1).max(64),
+  name: z.string().trim().min(1, "Add the website name").max(80),
+  url: z.url({ protocol: /^https?$/, error: "Add the full web address, e.g. https://example.com" }).max(300),
+  description: z.string().trim().max(600),
+  /** Screenshot of the site's hero section. */
+  image: mediaSchema.optional(),
+  /** Short chips like "Next.js", "E-commerce", "UI/UX". */
+  tags: z.array(z.string().trim().min(1).max(40)).max(8),
+  year: z.string().trim().max(10).optional(),
+  published: z.boolean(),
+  order: z.number(),
+  createdAt: z.number(),
+});
+export type Website = z.infer<typeof websiteSchema>;
 
+export const testimonialSchema = z.object({
+  id: z.string().min(1).max(64),
+  quote: z.string().trim().min(1, "Add what the client said").max(700),
+  name: z.string().trim().min(1, "Add the client's name").max(80),
+  /** e.g. "Founder, UrbanDrop" */
+  role: z.string().trim().max(120).optional(),
+  avatar: mediaSchema.optional(),
+  published: z.boolean(),
+  order: z.number(),
+  createdAt: z.number(),
+});
+export type Testimonial = z.infer<typeof testimonialSchema>;
+
+export type SiteContent = { projects: Project[]; brands: Brand[]; websites: Website[]; testimonials: Testimonial[] };
+
+/** Fills in lists that older saved content doesn't have yet. */
+export const normalizeContent = (c: Partial<SiteContent> | null | undefined): SiteContent => ({
+  projects: c?.projects ?? [],
+  brands: c?.brands ?? [],
+  websites: c?.websites ?? [],
+  testimonials: c?.testimonials ?? [],
+});
+
+/** A message sent from the website (older entries are full project briefs). */
 export type Inquiry = {
   id: string;
   name: string;
-  email: string;
-  company?: string;
-  services: string[];
-  budget: string;
-  timeline: string;
+  /** Email address or phone number the visitor left. */
+  contact?: string;
+  email?: string;
   message: string;
-  status: string;
+  /** What they were looking at when they wrote, e.g. "Brand Identity". */
+  topic?: string;
+  status: "new" | "read" | (string & {});
   createdAt: number;
+  company?: string;
+  services?: string[];
+  budget?: string;
+  timeline?: string;
 };
 
 /* ------------------------------------------------------------------ */

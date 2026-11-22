@@ -2,13 +2,13 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { whatsappUrl } from "@/lib/contact";
-import { useIntroDone, useProjectDrawer } from "@/lib/store";
+import { useIntroDone, useMessageDrawer } from "@/lib/store";
 import { WhatsAppIcon } from "./WhatsAppIcon";
 
 /** Floating "Chat on WhatsApp" — always one tap away. */
 export function WhatsAppButton() {
   const introDone = useIntroDone();
-  const drawerOpen = useProjectDrawer();
+  const drawerOpen = useMessageDrawer().open;
   const show = introDone && !drawerOpen;
 
   return (

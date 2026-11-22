@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRef } from "react";
 import type { Project } from "@/lib/content/types";
 import { gsap, useGSAP } from "@/lib/gsap";
-import { openProjectDrawer } from "@/lib/store";
+import { openMessage } from "@/lib/store";
 import { ProjectCover } from "@/components/work/ProjectCover";
 import { ArrowUpRight } from "@/components/ui/Primitives";
 
@@ -125,7 +125,7 @@ export function Gallery({ projects }: { projects: Project[] }) {
           {/* Closing card */}
           <button
             type="button"
-            onClick={openProjectDrawer}
+            onClick={() => openMessage()}
             data-g-card
             className="group flex aspect-[4/5] w-[72vw] shrink-0 snap-start flex-col justify-between rounded-[22px] bg-ink p-7 text-left text-white sm:w-[44vw] lg:w-[clamp(300px,25vw,420px)]"
           >

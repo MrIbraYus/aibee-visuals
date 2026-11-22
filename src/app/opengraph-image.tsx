@@ -37,7 +37,7 @@ export default function OpenGraphImage() {
             ["Brand Identity", "#e90059", "#fff"],
             ["Logo Design", "#b7f500", "#080808"],
             ["UI/UX & Web", "#1261f5", "#fff"],
-            ["Social Media", "#00b94f", "#080808"],
+            ["Social Media", "#FFD600", "#080808"],
           ].map(([label, bg, fg]) => (
             <div key={label} style={{ background: bg, color: fg, borderRadius: 999, padding: "12px 26px", fontSize: 24 }}>
               {label}

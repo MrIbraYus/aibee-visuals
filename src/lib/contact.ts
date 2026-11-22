@@ -12,31 +12,3 @@ export const mailtoUrl = (subject?: string, body?: string) => {
 };
 
 export const telUrl = () => `tel:${site.phoneIntl}`;
-
-export type BriefFields = {
-  services: readonly string[];
-  budget: string;
-  timeline: string;
-  name: string;
-  email: string;
-  company?: string;
-  message: string;
-};
-
-/** Plain-text brief used for WhatsApp, email and server notifications. */
-export function formatBrief(b: BriefFields) {
-  return [
-    `Hi Aibee Visuals! I'd like to start a project.`,
-    ``,
-    `Name: ${b.name}`,
-    b.company ? `Company: ${b.company}` : null,
-    `Email: ${b.email}`,
-    `Services: ${b.services.join(", ")}`,
-    `Budget: ${b.budget}`,
-    `Timeline: ${b.timeline}`,
-    ``,
-    b.message,
-  ]
-    .filter((line) => line !== null)
-    .join("\n");
-}

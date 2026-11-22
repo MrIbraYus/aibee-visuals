@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
+  // Required at runtime by Node rather than bundled (CommonJS).
+  serverExternalPackages: ["web-push"],
   // Lets phones on the same Wi-Fi load the dev server (http://<this-PC's-IP>:3000).
   allowedDevOrigins: ["192.168.100.16", "*.local"],
   partialPrefetching: true,

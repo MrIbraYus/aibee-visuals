@@ -8,7 +8,7 @@ import { mediaThumb } from "@/lib/media/urls";
 import { whatsappUrl } from "@/lib/contact";
 import { Reveal } from "@/components/work/Reveal";
 import { ProjectGallery } from "@/components/work/ProjectGallery";
-import { StartProjectButton } from "@/components/work/StartProjectButton";
+import { MessageButton } from "@/components/work/MessageButton";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 
 export async function generateStaticParams() {
@@ -110,7 +110,7 @@ async function ProjectContent({ params }: { params: PageProps<"/work/[slug]">["p
               )}
             </dl>
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <StartProjectButton />
+              <MessageButton topic={`A project like ${project.client}`} />
               <a
                 href={whatsappUrl(`Hi Aibee Visuals! I saw the ${project.client} project and I'd like something similar.`)}
                 target="_blank"

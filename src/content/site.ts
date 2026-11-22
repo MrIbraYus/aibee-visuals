@@ -23,11 +23,32 @@ export const navLinks = [
   { label: "Contact", href: "#contact" },
 ] as const;
 
-export const heroPills = [
-  { label: "Brand Identity", className: "bg-magenta text-white", href: "#services" },
-  { label: "Logo Design", className: "bg-lime text-ink", href: "#services" },
-  { label: "UI/UX & Web", className: "bg-blue text-white", href: "#services" },
-  { label: "Social Media", className: "bg-emerald text-ink", href: "#services" },
+/** What we do — the hero pills cycle through these, one pill at a time. */
+export const whatWeDo = [
+  "Brand Identity",
+  "Logo Design",
+  "UI/UX Design",
+  "Web Development",
+  "Digital Illustration",
+  "Brand Design",
+  "Graphic Design",
+  "Visual Identity",
+  "Frontend Development",
+  "Social Media Design",
+  "Creative Direction",
+  "Digital Experiences",
+  "Content Creation",
+  "IT Support",
+  "Adobe Illustrator",
+  "AI-Powered Workflows",
+] as const;
+
+/** Hero pill colours: resting look and hover look (text always contrasts its background). */
+export const pillTones = [
+  "bg-magenta text-white hover:bg-lime hover:text-ink hover:shadow-[0_10px_34px_rgba(183,245,0,0.35)]",
+  "bg-lime text-ink hover:bg-magenta hover:text-white hover:shadow-[0_10px_34px_rgba(233,0,89,0.4)]",
+  "bg-blue text-white hover:bg-emerald hover:text-ink hover:shadow-[0_10px_34px_rgba(0,185,79,0.4)]",
+  "bg-emerald text-ink hover:bg-blue hover:text-white hover:shadow-[0_10px_34px_rgba(18,97,245,0.45)]",
 ] as const;
 
 export type Service = {

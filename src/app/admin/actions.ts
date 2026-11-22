@@ -13,8 +13,35 @@ import {
 } from "@/lib/admin/auth";
 import { lockoutMinutes, recordAttempt, saveSecret, secretInfo, verifySecret } from "@/lib/admin/pin";
 import { CONTENT_TAG } from "@/lib/content/queries";
-import { listInquiries, readContent, removeProject, setBrands, storageMode, upsertProjects, type StorageMode } from "@/lib/content/store";
-import { brandSchema, projectSchema, type Brand, type Inquiry, type Media, type Project, type SiteContent } from "@/lib/content/types";
+import {
+  deleteInquiry,
+  listInquiries,
+  readContent,
+  removeProject,
+  setBrands,
+  setTestimonials,
+  setWebsites,
+  storageMode,
+  unreadInquiries,
+  updateInquiry,
+  upsertProjects,
+  type StorageMode,
+  type UnreadSummary,
+} from "@/lib/content/store";
+import {
+  brandSchema,
+  projectSchema,
+  testimonialSchema,
+  websiteSchema,
+  type Brand,
+  type Inquiry,
+  type Media,
+  type Project,
+  type SiteContent,
+  type Testimonial,
+  type Website,
+} from "@/lib/content/types";
+import { pushAvailable, pushPublicKey, removePushSubscription, savePushSubscription, sendPush } from "@/lib/server/push";
 import { deleteMedia, mediaMode, uploadTarget, type MediaMode, type UploadTarget } from "@/lib/media/server";
 import { firebaseAdminConfigured, firebaseAdminError } from "@/lib/server/firebase-admin";
 
@@ -36,6 +63,8 @@ export type AdminState = {
   content?: SiteContent;
   /** Setup problems worth showing on the sign-in screen (missing/broken keys…). */
   problems: string[];
+  /** Unread website messages (signed in only). */
+  unread?: number;
 };
 
 /* ------------------------------------------------------------------ */
@@ -78,7 +107,8 @@ export async function getAdminState(): Promise<AdminState> {
   };
   if (!session) return { authed: false, ...base };
   try {
-    return { authed: true, user: session.sub, ...base, content: await readContent() };
+    const [content, unread] = await Promise.all([readContent(), unreadInquiries().catch(() => ({ count: 0 }))]);
+    return { authed: true, user: session.sub, ...base, content, unread: unread.count };
   } catch (err) {
     return {
       authed: false,
@@ -207,6 +237,117 @@ export async function saveBrands(input: Brand[]): Promise<Result<Brand[]>> {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Websites & testimonials                                             */
+/* ------------------------------------------------------------------ */
+
+export async function saveWebsites(input: Website[]): Promise<Result<Website[]>> {
+  try {
+    await requireAdmin();
+    const websites = z.array(websiteSchema).max(100).parse(input);
+    const { websites: before } = await readContent();
+    const keep = new Set(websites.map((w) => w.image?.url).filter(Boolean));
+    await Promise.all(before.filter((w) => w.image && !keep.has(w.image.url)).map((w) => deleteMedia(w.image)));
+    await setWebsites(websites);
+    refresh();
+    return { ok: true, data: websites };
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+export async function saveTestimonials(input: Testimonial[]): Promise<Result<Testimonial[]>> {
+  try {
+    await requireAdmin();
+    const testimonials = z.array(testimonialSchema).max(100).parse(input);
+    const { testimonials: before } = await readContent();
+    const keep = new Set(testimonials.map((t) => t.avatar?.url).filter(Boolean));
+    await Promise.all(before.filter((t) => t.avatar && !keep.has(t.avatar.url)).map((t) => deleteMedia(t.avatar)));
+    await setTestimonials(testimonials);
+    refresh();
+    return { ok: true, data: testimonials };
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Messages & notifications                                            */
+/* ------------------------------------------------------------------ */
+
+export async function getUnread(): Promise<Result<UnreadSummary>> {
+  try {
+    await requireAdmin();
+    return { ok: true, data: await unreadInquiries() };
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+export async function setMessageStatus(id: string, status: "new" | "read"): Promise<Result> {
+  try {
+    await requireAdmin();
+    await updateInquiry(z.string().min(1).max(128).parse(id), { status: z.enum(["new", "read"]).parse(status) });
+    return { ok: true, data: undefined };
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+export async function deleteMessage(id: string): Promise<Result> {
+  try {
+    await requireAdmin();
+    await deleteInquiry(z.string().min(1).max(128).parse(id));
+    return { ok: true, data: undefined };
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+export async function getPushKey(): Promise<Result<string | null>> {
+  try {
+    await requireAdmin();
+    return { ok: true, data: pushAvailable() ? await pushPublicKey() : null };
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+const subscriptionSchema = z.object({
+  endpoint: z.url().max(1000),
+  keys: z.object({ p256dh: z.string().min(1).max(200), auth: z.string().min(1).max(100) }),
+});
+
+export async function subscribeToPush(input: unknown, device?: string): Promise<Result> {
+  try {
+    await requireAdmin();
+    await savePushSubscription(subscriptionSchema.parse(input), typeof device === "string" ? device : undefined);
+    return { ok: true, data: undefined };
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+export async function unsubscribeFromPush(endpoint: string): Promise<Result> {
+  try {
+    await requireAdmin();
+    await removePushSubscription(z.string().max(1000).parse(endpoint));
+    return { ok: true, data: undefined };
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+export async function sendTestPush(): Promise<Result<number>> {
+  try {
+    await requireAdmin();
+    const sent = await sendPush({ title: "Notifications are on", body: "New messages from your website will show up here.", tag: "test" });
+    return { ok: true, data: sent };
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /*  Media & briefs                                                      */
 /* ------------------------------------------------------------------ */
 
@@ -223,9 +364,12 @@ export async function getUploadTarget(): Promise<Result<UploadTarget>> {
 export async function discardMedia(media: Media): Promise<Result> {
   try {
     await requireAdmin();
-    const { projects, brands } = await readContent();
+    const { projects, brands, websites, testimonials } = await readContent();
     const used =
-      projects.some((p) => p.assets.some((a) => a.media.url === media.url)) || brands.some((b) => b.logo?.url === media.url);
+      projects.some((p) => p.assets.some((a) => a.media.url === media.url)) ||
+      brands.some((b) => b.logo?.url === media.url) ||
+      websites.some((w) => w.image?.url === media.url) ||
+      testimonials.some((t) => t.avatar?.url === media.url);
     if (!used) await deleteMedia(media);
     return { ok: true, data: undefined };
   } catch (err) {

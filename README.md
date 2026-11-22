@@ -22,8 +22,10 @@ is locked out for 15 minutes. Google sign-in also works for the email in `NEXT_P
 | **Projects** | One project per brand: name, title, category, year, summary, services, accent colour, featured / hidden. Upload **designs, logos, illustrations and motion** (images and videos, drag-and-drop, several at once). Set the cover, captions, order; drag projects to reorder the site. |
 | **Hero** | The images riding the homepage arc. Pick from your library or upload new ones; drag to reorder. |
 | **Brands** | Logos in the “Brands we’ve helped move forward” strip (transparent PNG/SVG; shown white on dark). |
+| **Websites** | Sites you've designed or built: hero screenshot, name, web address, description, tags and year. Drag to reorder; switch any off. The homepage section appears once one is live. |
 | **Motion** | Logo animations, motion graphics and videos; mark pieces for the homepage reel. Poster frames are grabbed automatically. |
-| **Briefs** | Every brief sent from the “Start a project” form. |
+| **Testimonials** | Client quotes with name, role and an optional photo. The homepage section appears once one is live. |
+| **Messages** | Everything sent from the website's message form, with an unread badge. Reply on WhatsApp, by email or call in one tap. |
 
 Every save updates the live site immediately — the homepage, `/work`, each brand page at
 `/work/<link>` (with Designs / Logos / Illustrations / Motion tabs) and `/motion`.
@@ -70,18 +72,28 @@ live site is read-only. To edit from anywhere:
 
 Uploads already go to **Cloudinary** (images and videos are optimised automatically).
 
-## How project briefs reach you
+## How messages reach you
 
-1. **WhatsApp (works now):** the brief form opens WhatsApp with the full brief addressed to
-   **024 083 2129** — the client just taps send. A copy is kept for the dashboard’s **Briefs** page.
-2. **Automatic WhatsApp alert (optional):** add the `WHATSAPP_*` keys (Meta WhatsApp Cloud API).
-3. **Paystack (optional):** `PAYSTACK_SECRET_KEY` enables the paid discovery-session booking after a brief.
+Visitors either **send a message** (name, email or phone, message) or tap **WhatsApp** to chat
+with **024 083 2129** directly.
+
+1. **Dashboard inbox:** every message lands in **/admin → Messages** (unread badge, and the browser
+   tab shows the count while the dashboard is open).
+2. **Notifications on your phone/computer:** in **Messages**, tap **Turn on notifications** on each
+   device you want alerts on. Alerts arrive even when the dashboard is closed. No setup needed: the
+   keys are created automatically and kept in Firebase. On iPhone, first add the site to your Home
+   Screen (Share → Add to Home Screen), open it from there, then turn notifications on.
+3. **Automatic WhatsApp alert (optional):** add the `WHATSAPP_*` keys (Meta WhatsApp Cloud API).
+
+The Paystack routes are still in the code (`src/app/api/paystack`) but no longer used by the site.
 
 ## Where things are
 
 | Area | Files |
 | --- | --- |
 | Dashboard UI | `src/components/admin/` · server actions in `src/app/admin/actions.ts` |
+| Message form, panel, notifications | `src/components/contact/`, `src/app/api/inquiries`, `src/lib/server/push.ts`, `public/sw.js` |
+| Hero "what we do" pills | list in `src/content/site.ts` (`whatWeDo`), component `src/components/hero/ServicePills.tsx` |
 | Content model, starter content, storage | `src/lib/content/` |
 | Media URLs + uploads | `src/lib/media/`, `src/app/api/admin/media`, `src/app/api/media` |
 | Contact details / services / process | `src/content/contact.ts`, `src/content/site.ts` |
