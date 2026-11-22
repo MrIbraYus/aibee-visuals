@@ -111,7 +111,7 @@ export async function sendPush(payload: PushPayload): Promise<number> {
   if (!pushAvailable()) return 0;
   const [keys, subs] = await Promise.all([vapidKeys(), listSubscriptions()]);
   if (!keys || !subs.length) return 0;
-  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const site = (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim().replace(/\/+$/, "");
   const options = {
     TTL: 60 * 60 * 24,
     urgency: "high" as const,

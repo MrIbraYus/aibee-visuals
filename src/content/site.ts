@@ -1,11 +1,28 @@
 import { contact } from "./contact";
 
+/**
+ * The live address, from NEXT_PUBLIC_SITE_URL. Tolerates a trailing slash, a
+ * missing https:// or an empty value, so a small typo in the hosting settings
+ * can't produce "//work" links or crash every page.
+ */
+function siteUrl() {
+  const fallback = "https://aibeevisuals.vercel.app";
+  let raw = (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim();
+  if (!raw) return fallback;
+  if (!/^https?:\/\//i.test(raw)) raw = `https://${raw}`;
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return fallback;
+  }
+}
+
 export const site = {
   name: "Aibee Visuals",
   tagline: "Creative. Strategic. Impactful.",
   description:
     "Aibee Visuals is an independent design studio. We combine strategic thinking, bold creativity and digital expertise to build distinctive brands and meaningful digital experiences.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://aibeevisuals.com",
+  url: siteUrl(),
   ...contact,
   socials: [
     { label: "Instagram", href: "https://instagram.com/aibeevisuals", short: "ig" },
