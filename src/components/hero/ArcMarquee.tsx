@@ -332,7 +332,7 @@ export const ArcMarquee = forwardRef<ArcMarqueeHandle, Props>(function ArcMarque
                   alt={i < items.length ? item.alt : ""}
                   fill
                   draggable={false}
-                  loading={i < 6 ? "eager" : "lazy"}
+                  loading={i < items.length ? "eager" : "lazy"}
                   fetchPriority={i < 4 ? "high" : "auto"}
                   sizes="(max-width: 768px) 46vw, 22vw"
                   className="pointer-events-none object-cover"

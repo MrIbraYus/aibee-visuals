@@ -77,7 +77,7 @@ export function WebsitesView() {
     <>
       <PageHeader
         title="Websites"
-        subtitle="Sites you've designed or built. Each one shows on the homepage with a screenshot of its hero section, a short description and a link to visit it."
+        subtitle="Sites you've designed or built. Each one shows in the homepage websites section with a screenshot of its hero section, a short description and a link, stacked above the “Your website could be next” card."
         actions={
           <>
             <Button tone="outline" onClick={add} disabled={!canWrite}>

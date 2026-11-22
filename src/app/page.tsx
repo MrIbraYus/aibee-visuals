@@ -45,7 +45,7 @@ export default async function Home() {
       <Studio />
       <Services />
       <Work projects={featured.length ? featured : projects.slice(0, 5)} />
-      {websites.length > 0 && <Websites sites={websites} />}
+      <Websites sites={websites} />
       <Gallery projects={projects} />
       <Manifesto images={arc.slice(0, 3).map((a) => a.src)} />
       <MotionReel items={motion} />

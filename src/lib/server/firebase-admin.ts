@@ -44,9 +44,21 @@ export function getAdminApp(): App | null {
   return app;
 }
 
+let db: Firestore | null = null;
+
 export function getAdminDb(): Firestore | null {
+  if (db) return db;
   const a = getAdminApp();
-  return a ? getFirestore(a) : null;
+  if (!a) return null;
+  db = getFirestore(a);
+  try {
+    // Optional fields left empty (e.g. a website with no year) arrive as
+    // `undefined`, which Firestore otherwise refuses to save.
+    db.settings({ ignoreUndefinedProperties: true });
+  } catch {
+    // Already configured (e.g. after a hot reload in development).
+  }
+  return db;
 }
 
 export function getAdminAuth(): Auth | null {

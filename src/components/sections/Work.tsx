@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Project } from "@/lib/content/types";
 import { gsap, SplitText, useGSAP } from "@/lib/gsap";
-import { lenisStore, openMessage } from "@/lib/store";
+import { lenisStore, openMessage, scrollToTarget } from "@/lib/store";
 import { ArrowUpRight, PillButton } from "@/components/ui/Primitives";
 import { ProjectCover } from "@/components/work/ProjectCover";
 import { cn, prefersReducedMotion } from "@/lib/utils";
@@ -204,13 +204,28 @@ export function Work({ projects }: { projects: Project[] }) {
           >
             A few things we&apos;ve brought to life.
           </h2>
-          <Link data-work-link href="/work" className="group flex items-center gap-2 text-[14px] font-medium text-lime">
-            <span className="relative">
-              Explore all work
-              <span className="absolute -bottom-0.5 left-0 h-px w-full origin-right scale-x-0 bg-lime transition-transform duration-500 ease-expo group-hover:origin-left group-hover:scale-x-100" />
-            </span>
-            <ArrowUpRight className="size-4 transition-transform duration-500 ease-expo group-hover:rotate-45" />
-          </Link>
+          <div data-work-link className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <button
+              type="button"
+              onClick={() => scrollToTarget("#websites", -20)}
+              className="group flex items-center gap-2 text-[14px] font-medium text-white/80 transition-colors hover:text-white"
+            >
+              <span className="relative">
+                Websites we&apos;ve built
+                <span className="absolute -bottom-0.5 left-0 h-px w-full origin-right scale-x-0 bg-white/70 transition-transform duration-500 ease-expo group-hover:origin-left group-hover:scale-x-100" />
+              </span>
+              <svg viewBox="0 0 24 24" className="size-4 transition-transform duration-500 ease-expo group-hover:translate-y-0.5" aria-hidden>
+                <path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            <Link href="/work" className="group flex items-center gap-2 text-[14px] font-medium text-lime">
+              <span className="relative">
+                Explore all work
+                <span className="absolute -bottom-0.5 left-0 h-px w-full origin-right scale-x-0 bg-lime transition-transform duration-500 ease-expo group-hover:origin-left group-hover:scale-x-100" />
+              </span>
+              <ArrowUpRight className="size-4 transition-transform duration-500 ease-expo group-hover:rotate-45" />
+            </Link>
+          </div>
         </div>
 
         <div

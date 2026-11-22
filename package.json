@@ -11,7 +11,8 @@
     "images:optimize": "bun scripts/optimize-images.ts",
     "media:upload": "node --env-file-if-exists=.env.local scripts/upload-media.mts",
     "content:publish": "node --env-file-if-exists=.env.local scripts/publish-content.mts",
-    "admin:pin": "node --env-file-if-exists=.env.local scripts/set-admin-pin.mts"
+    "admin:pin": "node --env-file-if-exists=.env.local scripts/set-admin-pin.mts",
+    "setup:check": "node --env-file-if-exists=.env.local scripts/check-setup.mts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

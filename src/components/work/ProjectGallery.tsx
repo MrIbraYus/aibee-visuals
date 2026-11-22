@@ -67,7 +67,7 @@ export function ProjectGallery({ project }: { project: Project }) {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className={cn("break-inside-avoid", tab !== "logo" && "mb-5")}
           >
-            <Tile asset={asset} project={project} onOpen={() => setOpen(i)} priority={i < 2} />
+            <Tile asset={asset} project={project} onOpen={() => setOpen(i)} priority={i < 2} eager={i < 4} />
           </motion.li>
         ))}
       </ul>
@@ -77,7 +77,19 @@ export function ProjectGallery({ project }: { project: Project }) {
   );
 }
 
-function Tile({ asset, project, onOpen, priority }: { asset: Asset; project: Project; onOpen: () => void; priority?: boolean }) {
+function Tile({
+  asset,
+  project,
+  onOpen,
+  priority,
+  eager,
+}: {
+  asset: Asset;
+  project: Project;
+  onOpen: () => void;
+  priority?: boolean;
+  eager?: boolean;
+}) {
   const ratio = aspectOf(asset.media);
   if (asset.media.kind === "video") {
     return (
@@ -109,6 +121,7 @@ function Tile({ asset, project, onOpen, priority }: { asset: Asset; project: Pro
             alt={`${project.client} — ${asset.title ?? project.title}`}
             fill
             preload={priority}
+            loading={eager ? "eager" : "lazy"}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className={cn("transition-transform duration-700 ease-expo group-hover:scale-[1.03]", logo ? "object-contain" : "object-cover")}
           />

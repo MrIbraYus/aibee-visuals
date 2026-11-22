@@ -14,7 +14,7 @@ function useLogoGeometry() {
     const { width, height } = LOGOMARK_VIEWBOX;
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}"><path d="${LOGOMARK_PATH}"/></svg>`;
     const data = new SVGLoader().parse(svg);
-    const shapes = data.paths.flatMap((p) => SVGLoader.createShapes(p));
+    const shapes = data.paths.flatMap((p) => p.toShapes());
     const geo = new THREE.ExtrudeGeometry(shapes, {
       depth: 7,
       bevelEnabled: true,

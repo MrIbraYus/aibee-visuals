@@ -12,15 +12,16 @@ function Wordmark({ brand }: { brand: Brand }) {
   if (brand.logo) {
     const ratio = brand.logo.width && brand.logo.height ? brand.logo.width / brand.logo.height : 4;
     const h = ratio > 3 ? 28 : ratio > 1.6 ? 34 : 44;
+    const w = Math.min(Math.round(h * ratio), 180);
     return (
       <Image
         {...imageProps(brand.logo.url)}
         alt={brand.name}
-        width={Math.round(h * ratio)}
+        width={w}
         height={h}
         sizes="240px"
-        className="h-auto w-auto max-w-[180px] object-contain opacity-90 brightness-0 invert"
-        style={{ height: h, width: "auto" }}
+        className="object-contain opacity-90 brightness-0 invert"
+        style={{ width: w, height: h }}
       />
     );
   }

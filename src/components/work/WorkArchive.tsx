@@ -3,23 +3,28 @@
 import Link from "next/link";
 import { AnimatePresence, LayoutGroup, motion } from "motion/react";
 import { useMemo, useState } from "react";
-import { categories, type Category, type Project } from "@/lib/content/types";
+import { categories, type Category, type Project, type Website } from "@/lib/content/types";
 import { ProjectCover } from "./ProjectCover";
+import { WebsiteCard } from "./WebsiteCard";
 import { ArrowUpRight } from "@/components/ui/Primitives";
 import { cn } from "@/lib/utils";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-/** Filterable archive grid for /work. */
-export function WorkArchive({ projects }: { projects: Project[] }) {
-  const [filter, setFilter] = useState<Category | "All">("All");
+type Filter = Category | "All" | "Websites";
+
+/** Filterable archive for /work: projects, then the websites we've built. */
+export function WorkArchive({ projects, websites }: { projects: Project[]; websites: Website[] }) {
+  const [filter, setFilter] = useState<Filter>("All");
   const used = useMemo(() => categories.filter((c) => projects.some((p) => p.category === c)), [projects]);
-  const shown = filter === "All" ? projects : projects.filter((p) => p.category === filter);
+  const shown = filter === "All" ? projects : filter === "Websites" ? [] : projects.filter((p) => p.category === filter);
+  const tabs: Filter[] = ["All", ...(websites.length ? (["Websites"] as const) : []), ...used];
+  const showSites = websites.length > 0 && (filter === "All" || filter === "Websites");
 
   return (
     <LayoutGroup>
       <div role="tablist" aria-label="Filter projects" className="flex flex-wrap gap-2">
-        {(["All", ...used] as const).map((c) => {
+        {tabs.map((c) => {
           const active = filter === c;
           return (
             <button
@@ -40,13 +45,16 @@ export function WorkArchive({ projects }: { projects: Project[] }) {
                   transition={{ type: "spring", stiffness: 380, damping: 32 }}
                 />
               )}
-              <span className="relative">{c}</span>
+              <span className="relative">
+                {c}
+                {c === "Websites" && <span className={cn("ml-1.5 tabular-nums", active ? "text-ink/60" : "text-white/45")}>{websites.length}</span>}
+              </span>
             </button>
           );
         })}
       </div>
 
-      <motion.ul layout className="mt-12 grid gap-x-6 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+      <motion.ul layout className={cn("grid gap-x-6 gap-y-14 sm:grid-cols-2 lg:grid-cols-3", shown.length > 0 && "mt-12")}>
         <AnimatePresence mode="popLayout">
           {shown.map((project, i) => (
             <motion.li
@@ -78,6 +86,43 @@ export function WorkArchive({ projects }: { projects: Project[] }) {
           ))}
         </AnimatePresence>
       </motion.ul>
+
+      <AnimatePresence>
+        {showSites && (
+          <motion.section
+            key="websites"
+            layout
+            aria-labelledby="work-websites-title"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.8, ease } }}
+            exit={{ opacity: 0, transition: { duration: 0.25 } }}
+            className={filter === "All" ? "mt-[clamp(80px,9vw,140px)] border-t border-line pt-[clamp(48px,6vw,80px)]" : "mt-12"}
+          >
+            {filter === "All" && (
+              <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                <h2 id="work-websites-title" className="max-w-[16ch] text-[clamp(34px,4vw,60px)] font-semibold leading-[1] tracking-[-0.045em]">
+                  Websites we&apos;ve designed <span className="serif-i font-normal">&amp; built.</span>
+                </h2>
+                <p className="max-w-[36ch] text-[15px] leading-[1.55] text-muted">Live sites you can visit, from first wireframe to launch day.</p>
+              </div>
+            )}
+            <ul className="grid gap-x-6 gap-y-14 sm:grid-cols-2">
+              {websites.map((site, i) => (
+                <motion.li
+                  key={site.id}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.8, ease, delay: Math.min(i % 2, 1) * 0.08 }}
+                >
+                  <WebsiteCard site={site} index={i} priority={filter === "Websites" && i < 2} />
+                </motion.li>
+              ))}
+            </ul>
+            {filter === "Websites" && <h2 id="work-websites-title" className="sr-only">Websites</h2>}
+          </motion.section>
+        )}
+      </AnimatePresence>
     </LayoutGroup>
   );
 }
