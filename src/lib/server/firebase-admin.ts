@@ -18,6 +18,20 @@ export const firebaseAdminError = () => {
  * isn't configured — or is malformed, in which case the reason is kept in
  * `firebaseAdminError()` instead of crashing every page.
  */
+/**
+ * Accepts the service-account key however it was pasted: with or without
+ * surrounding quotes, with real or escaped (\n) line breaks, Windows line
+ * endings, or even without its BEGIN/END lines.
+ */
+function normalizePrivateKey(raw: string) {
+  let key = raw.trim().replace(/^"|"$/g, "").replace(/\\n/g, "\n").replace(/\r/g, "").trim();
+  if (!key.includes("PRIVATE KEY-----")) {
+    const body = key.replace(/\s+/g, "");
+    key = `-----BEGIN PRIVATE KEY-----\n${body.match(/.{1,64}/g)?.join("\n") ?? ""}\n-----END PRIVATE KEY-----\n`;
+  }
+  return key;
+}
+
 export function getAdminApp(): App | null {
   if (app !== undefined) return app;
   if (!firebaseAdminConfigured()) {
@@ -31,12 +45,14 @@ export function getAdminApp(): App | null {
         credential: cert({
           projectId: process.env.FIREBASE_PROJECT_ID!.trim(),
           clientEmail: process.env.FIREBASE_CLIENT_EMAIL!.trim(),
-          // Accept the key pasted with or without surrounding quotes, with real or escaped newlines.
-          privateKey: process.env.FIREBASE_PRIVATE_KEY!.trim().replace(/^"|"$/g, "").replace(/\\n/g, "\n"),
+          privateKey: normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY!),
         }),
       });
   } catch (err) {
-    initError = `Firebase keys are set but couldn't be used: ${err instanceof Error ? err.message : String(err)}`;
+    const reason = err instanceof Error ? err.message : String(err);
+    initError = /private key/i.test(reason)
+      ? `FIREBASE_PRIVATE_KEY can't be read (${reason}). Paste the whole key, from -----BEGIN PRIVATE KEY----- to -----END PRIVATE KEY-----, as a single value.`
+      : `Firebase keys are set but couldn't be used: ${reason}`;
     console.error("[firebase-admin]", initError);
     app = null;
   }
