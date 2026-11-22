@@ -1,9 +1,6 @@
 @import "tailwindcss";
 @import "lenis/dist/lenis.css";
 
-/* Large screens tall enough for scroll-stacked cards */
-@custom-variant stack (@media (min-width: 1024px) and (min-height: 720px));
-
 /* ------------------------------------------------------------------
    Aibee Visuals design tokens (from Figma: Aibee / Web styles)
 ------------------------------------------------------------------- */

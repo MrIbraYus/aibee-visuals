@@ -26,7 +26,7 @@ is locked out for 15 minutes. Google sign-in also works for the email in `NEXT_P
 | **Projects** | One project per brand: name, title, category, year, summary, services, accent colour, featured / hidden. Upload **designs, logos, illustrations and motion** (images and videos, drag-and-drop, several at once). Set the cover, captions, order; drag projects to reorder the site. |
 | **Hero** | The images riding the homepage arc. Pick from your library or upload new ones; drag to reorder. |
 | **Brands** | Logos in the “Brands we’ve helped move forward” strip (transparent PNG/SVG; shown white on dark). |
-| **Websites** | Sites you've designed or built: hero screenshot, name, web address, description, tags and year. Drag to reorder; switch any off. They stack above the section's “Your website could be next” card. |
+| **Websites** | Sites you've designed or built: hero screenshot, name, web address, description, tags and year. Drag to reorder; switch any off. They appear in a swipeable row on the homepage (above the “Your website could be next” card) and on the Work page. |
 | **Motion** | Logo animations, motion graphics and videos; mark pieces for the homepage reel. Poster frames are grabbed automatically. |
 | **Testimonials** | Client quotes with name, role and an optional photo. The homepage section appears once one is live. |
 | **Messages** | Everything sent from the website's message form, with an unread badge. Reply on WhatsApp, by email or call in one tap. |
