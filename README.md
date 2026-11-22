@@ -11,6 +11,10 @@ bun run dev        # http://localhost:3000  ·  dashboard at /admin
 
 Production build (needs Node.js 20+): `npm run build` then `npm start`. Also: `bun run lint`, `bun run typecheck`.
 
+**Check Firebase and Cloudinary:** `npm run setup:check` tests your keys, saving to Firestore, the
+security rules, the dashboard PIN, a real signed upload to Cloudinary (deleted afterwards) and every
+Cloudinary file the site uses.
+
 ## The dashboard (`/admin`)
 
 Sign in at **/admin** with your **PIN** — it's stored (hashed) in Firebase, so it works on the live site

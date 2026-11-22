@@ -5,3 +5,8 @@ git commit -m "Initial website upload"
 git branch -M main
 git push -u origin main
 
+
+Update Repo
+git add .
+git commit -m "Update website design"
+git push

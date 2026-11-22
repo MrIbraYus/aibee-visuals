@@ -66,7 +66,7 @@ export function Manifesto({ images }: { images: string[] }) {
                   data-pill
                   className="relative mx-[0.12em] inline-block h-[0.78em] w-[1.7em] overflow-hidden rounded-full align-[-0.06em]"
                 >
-                  <Image {...imageProps(url)} alt="" fill sizes="160px" className="object-cover" />
+                  <Image {...imageProps(url)} alt="" fill sizes="160px" loading="eager" fetchPriority="low" className="object-cover" />
                 </span>
               );
             }

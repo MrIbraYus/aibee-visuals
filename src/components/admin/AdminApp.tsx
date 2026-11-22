@@ -42,26 +42,37 @@ function Badge({ n, className }: { n: number; className?: string }) {
 }
 
 /** Root of the /admin dashboard: sign-in gate + responsive shell. */
+type LoadError = { message: string; digest?: string };
+type Health = { ok: boolean; checks: { name: string; ok: boolean; detail?: string }[] };
+
+const toLoadError = (err: unknown): LoadError => {
+  // Production hides server error details ("Minified React error #441"); the digest
+  // is the code to search for in Vercel → Logs.
+  const digest = typeof err === "object" && err && "digest" in err ? String((err as { digest: unknown }).digest) : undefined;
+  const message = err instanceof Error ? err.message : "The dashboard server didn't respond.";
+  return { message: /Minified React error #441/.test(message) ? "The dashboard server hit an error while starting up." : message, digest };
+};
+
 export function AdminApp() {
   const [state, setState] = useState<AdminState | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<LoadError | null>(null);
 
   const load = useCallback(async () => {
     setError(null);
     try {
       setState(await getAdminState());
     } catch (err) {
-      setError(err instanceof Error ? err.message : "The dashboard server didn't respond.");
+      setError(toLoadError(err));
     }
   }, []);
 
   useEffect(() => {
     let alive = true;
-    // Never leave the page spinning: give up after 20s and show why.
-    const timer = window.setTimeout(() => alive && setError("The dashboard is taking too long to respond."), 20000);
+    // Never leave the page spinning: give up after 30s and show why.
+    const timer = window.setTimeout(() => alive && setError({ message: "The dashboard is taking too long to respond." }), 30000);
     getAdminState()
       .then((s) => alive && setState(s))
-      .catch((err) => alive && setError(err instanceof Error ? err.message : "The dashboard server didn't respond."))
+      .catch((err) => alive && setError(toLoadError(err)))
       .finally(() => window.clearTimeout(timer));
     return () => {
       alive = false;
@@ -69,28 +80,7 @@ export function AdminApp() {
     };
   }, []);
 
-  if (error && !state) {
-    return (
-      <main className="grid min-h-svh place-items-center bg-ink px-5 text-white">
-        <div className="w-full max-w-[420px]">
-          <LogoMark className="size-10" />
-          <h1 className="mt-8 text-[28px] font-semibold leading-[1.1] tracking-[-0.03em]">The dashboard couldn&apos;t load.</h1>
-          <p className="mt-3 break-words rounded-2xl border border-magenta/40 bg-magenta/10 p-4 text-[14px] leading-[1.5]">{error}</p>
-          <p className="mt-3 text-[13px] text-muted">
-            Check your internet connection. On the live site, make sure the environment variables from .env.local are added in
-            Vercel, then redeploy.
-          </p>
-          <button
-            type="button"
-            onClick={() => window.location.reload()}
-            className="mt-6 w-full rounded-full bg-lime px-5 py-3.5 text-[14px] font-medium text-ink"
-          >
-            Try again
-          </button>
-        </div>
-      </main>
-    );
-  }
+  if (error && !state) return <LoadFailure error={error} />;
 
   if (!state) {
     return (
@@ -108,6 +98,74 @@ export function AdminApp() {
         await load();
       }} />
     </AdminProvider>
+  );
+}
+
+/** Shown when the dashboard can't start: what went wrong, plus a live setup check. */
+function LoadFailure({ error }: { error: LoadError }) {
+  const [health, setHealth] = useState<Health | null>(null);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/admin/health", { cache: "no-store" })
+      .then((r) => r.json() as Promise<Health>)
+      .then((h) => alive && setHealth(h))
+      .catch(() => {})
+      .finally(() => alive && setChecking(false));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  return (
+    <main className="grid min-h-svh place-items-center bg-ink px-5 py-10 text-white">
+      <div className="w-full max-w-[460px]">
+        <LogoMark className="size-10" />
+        <h1 className="mt-8 text-[28px] font-semibold leading-[1.1] tracking-[-0.03em]">The dashboard couldn&apos;t load.</h1>
+        <div className="mt-3 break-words rounded-2xl border border-magenta/40 bg-magenta/10 p-4 text-[14px] leading-[1.5]">
+          {error.message}
+          {error.digest && (
+            <p className="mt-2 text-[12px] text-white/70">
+              Error code <code className="select-all rounded bg-black/40 px-1.5 py-0.5 text-lime">{error.digest}</code>. Search for
+              it in Vercel → your project → Logs to see the full message.
+            </p>
+          )}
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-line bg-surface p-4">
+          <p className="text-[13px] font-semibold">Setup check</p>
+          {checking ? (
+            <p className="mt-2 text-[13px] text-muted">Checking…</p>
+          ) : health ? (
+            <ul className="mt-2 space-y-1.5 text-[13px]">
+              {health.checks.map((c) => (
+                <li key={c.name} className="flex gap-2">
+                  <span className={c.ok ? "text-lime" : "text-magenta"}>{c.ok ? "✓" : "✗"}</span>
+                  <span>
+                    {c.name}
+                    {c.detail && <span className="block break-words text-[12px] text-muted">{c.detail}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-2 text-[13px] text-muted">The server didn&apos;t answer the setup check either. Check your internet connection, or the latest deployment in Vercel.</p>
+          )}
+        </div>
+
+        <p className="mt-3 text-[13px] text-muted">
+          After changing environment variables in Vercel, redeploy so the change takes effect.
+        </p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="mt-6 w-full rounded-full bg-lime px-5 py-3.5 text-[14px] font-medium text-ink"
+        >
+          Try again
+        </button>
+      </div>
+    </main>
   );
 }
 

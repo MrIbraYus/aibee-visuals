@@ -71,49 +71,58 @@ export type AdminState = {
 /*  Session                                                             */
 /* ------------------------------------------------------------------ */
 
+const messageOf = (err: unknown) => (err instanceof Error ? err.message : String(err)).split("\n")[0].slice(0, 300);
+
+/** Runs one setup step; a failure becomes a readable problem instead of crashing the dashboard. */
+async function step<T>(label: string, fallback: T, run: () => T | Promise<T>, problems: string[]): Promise<T> {
+  try {
+    return await run();
+  } catch (err) {
+    console.error(`[admin] ${label} failed`, err);
+    problems.push(`${label}: ${messageOf(err)}`);
+    return fallback;
+  }
+}
+
+/**
+ * Everything the dashboard needs to start. It never throws: in production a
+ * thrown error reaches the browser as an unreadable "React error #441", so each
+ * failure is reported by name on the sign-in screen instead.
+ */
 export async function getAdminState(): Promise<AdminState> {
   const problems: string[] = [];
-  const keyError = firebaseAdminError();
-  if (keyError) problems.push(keyError);
-  else if (process.env.VERCEL && !firebaseAdminConfigured()) {
-    problems.push("FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY aren't set in this deployment's environment variables.");
-  }
-
-  let secret: { enabled: boolean; pinLength?: number } = { enabled: false };
   try {
-    secret = await secretInfo();
+    const keyError = await step("Firebase keys", null, () => firebaseAdminError(), problems);
+    if (keyError) problems.push(keyError);
+    else if (process.env.VERCEL && !firebaseAdminConfigured()) {
+      problems.push("FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY aren't set in this deployment's environment variables.");
+    }
+
+    const storage = await step<StorageMode>("Database", "readonly", () => storageMode(), problems);
+    const media = await step<MediaMode>("Media storage", "none", () => mediaMode(), problems);
+    const secret = await step("Reading the dashboard PIN", { enabled: false } as { enabled: boolean; pinLength?: number }, () => secretInfo(), problems);
+    if (!secret.enabled && !keyError && firebaseAdminConfigured() && storage === "firestore") {
+      problems.push("No dashboard PIN is saved in Firebase yet. Run: npm run admin:pin -- 1234");
+    }
+    const google = await step("Google sign-in", false, () => googleLoginEnabled(), problems);
+    const session = await step("Reading your session", null, () => getSession(), problems);
+
+    const base = { storage, media, login: { google, password: secret.enabled, pinLength: secret.pinLength }, problems };
+    if (!session) return { authed: false, ...base };
+
+    const content = await step("Loading your content", null, () => readContent(), problems);
+    if (!content) return { authed: false, ...base };
+    const unread = await step("Counting messages", { count: 0 }, () => unreadInquiries(), []);
+    // Plain JSON only, so nothing unusual stored in the database can break the response.
+    return { authed: true, user: session.sub, ...base, content: JSON.parse(JSON.stringify(content)) as SiteContent, unread: unread.count };
   } catch (err) {
-    problems.push(`Couldn't read the dashboard PIN: ${err instanceof Error ? err.message : String(err)}`);
-  }
-  if (!secret.enabled && !keyError && firebaseAdminConfigured()) {
-    problems.push("No dashboard PIN is saved in Firebase yet. Run: npm run admin:pin -- 1234");
-  }
-
-  let google = false;
-  try {
-    google = googleLoginEnabled();
-  } catch {}
-
-  let session: Awaited<ReturnType<typeof getSession>> = null;
-  try {
-    session = await getSession();
-  } catch {}
-
-  const base = {
-    storage: storageMode(),
-    media: mediaMode(),
-    login: { google, password: secret.enabled, pinLength: secret.pinLength },
-    problems,
-  };
-  if (!session) return { authed: false, ...base };
-  try {
-    const [content, unread] = await Promise.all([readContent(), unreadInquiries().catch(() => ({ count: 0 }))]);
-    return { authed: true, user: session.sub, ...base, content, unread: unread.count };
-  } catch (err) {
+    console.error("[admin] getAdminState failed", err);
     return {
       authed: false,
-      ...base,
-      problems: [...problems, `Signed in, but the content couldn't be loaded: ${err instanceof Error ? err.message : String(err)}`],
+      storage: "readonly",
+      media: "none",
+      login: { google: false, password: false },
+      problems: [...problems, `The dashboard server hit an error: ${messageOf(err)}`],
     };
   }
 }
@@ -153,13 +162,22 @@ export async function changePin(current: string, next: string): Promise<Result> 
 }
 
 export async function signInWithGoogle(idToken: string): Promise<Result> {
-  const res = await loginWithGoogle(String(idToken));
-  return res.ok ? { ok: true, data: undefined } : { ok: false, error: res.error ?? "Sign-in failed." };
+  try {
+    const res = await loginWithGoogle(String(idToken));
+    return res.ok ? { ok: true, data: undefined } : { ok: false, error: res.error ?? "Sign-in failed." };
+  } catch (err) {
+    console.error("[admin] Google sign-in failed", err);
+    return fail(err);
+  }
 }
 
 export async function signOut(): Promise<Result> {
-  await clearSession();
-  return { ok: true, data: undefined };
+  try {
+    await clearSession();
+    return { ok: true, data: undefined };
+  } catch (err) {
+    return fail(err);
+  }
 }
 
 /* ------------------------------------------------------------------ */

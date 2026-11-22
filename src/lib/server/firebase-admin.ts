@@ -50,7 +50,13 @@ export function getAdminDb(): Firestore | null {
   if (db) return db;
   const a = getAdminApp();
   if (!a) return null;
-  db = getFirestore(a);
+  try {
+    db = getFirestore(a);
+  } catch (err) {
+    initError = `Firestore couldn't start: ${err instanceof Error ? err.message : String(err)}`;
+    console.error("[firebase-admin]", initError);
+    return null;
+  }
   try {
     // Optional fields left empty (e.g. a website with no year) arrive as
     // `undefined`, which Firestore otherwise refuses to save.
@@ -63,5 +69,11 @@ export function getAdminDb(): Firestore | null {
 
 export function getAdminAuth(): Auth | null {
   const a = getAdminApp();
-  return a ? getAuth(a) : null;
+  if (!a) return null;
+  try {
+    return getAuth(a);
+  } catch (err) {
+    console.error("[firebase-admin] Auth couldn't start", err);
+    return null;
+  }
 }
